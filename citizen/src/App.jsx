@@ -1,16 +1,27 @@
 import React from "react";
+import { Route, Routes } from "react-router-dom";
+import { Home } from "./pages/Home";
+import { Dashboard } from "./pages/Dashboard";
+import { RegisterComplaints } from "./pages/RegisterComplaints";
+import { MyComplaints } from "./pages/MyComplaints";
+import { ComplaintDetails } from "./pages/ComplaintDetails";
+import { Auth } from "./pages/Auth";
+import { Navbar } from "./components/Navbar";
+import { Footer } from "./components/Footer";
 
 const App = () => {
   return (
-    <div className="bg-red-400">
-      <ul className="hidden md:flex gap-8 text-gray-700 font-medium">
-        <li className="hover:text-primaryColor cursor-pointer">CIVIRA</li>
-        <li className="hover:text-primaryColor cursor-pointer">Dashboard</li>
-        <li className="hover:text-primaryColor cursor-pointer">
-          Register new complaint
-        </li>
-        <li className="hover:text-primaryColor cursor-pointer">Login</li>
-      </ul>
+    <div>
+      <Navbar></Navbar>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/register-complaints" element={<RegisterComplaints />} />
+        <Route path="/my-complaints" element={<MyComplaints />} />
+        <Route path="/complaint-details" element={<ComplaintDetails />} />
+        <Route path="/auth" element={<Auth />} />
+      </Routes>
+      <Footer></Footer>
     </div>
   );
 };
