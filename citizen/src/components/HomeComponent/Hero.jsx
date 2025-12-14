@@ -45,7 +45,7 @@ const Hero = () => {
 
   return (
     <section className="w-full py-12 bg-blue-50">
-      <div className="flex flex-col items-center gap-10 px-4 mx-auto max-w-7xl lg:flex-row">
+      <div className="flex flex-col-reverse items-center gap-10 px-4 mx-auto max-w-7xl lg:flex-row">
         {/* LEFT SECTION */}
         <div className="flex-1 text-center lg:text-left">
           <h1 className="text-4xl font-bold leading-tight text-blue-700 md:text-5xl">

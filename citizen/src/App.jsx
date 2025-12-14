@@ -5,7 +5,7 @@ import { Dashboard } from "./pages/Dashboard";
 import { RegisterComplaints } from "./pages/RegisterComplaints";
 import { MyComplaints } from "./pages/MyComplaints";
 import { ComplaintDetails } from "./pages/ComplaintDetails";
-import { Auth } from "./pages/Auth";
+import Auth from "./pages/Auth";
 import Navbar from "./components/Navbar";
 import { Footer } from "./components/Footer";
 
