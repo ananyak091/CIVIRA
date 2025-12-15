@@ -9,23 +9,18 @@ import { useAppContext } from "../context/AppContext";
 
 const Myprofile = () => {
   const backendurl = import.meta.env.VITE_API_BASE_URL;
-  const { login, loading, register, token, isLoggedIn, setIsLoggedIn } =
-    useAppContext();
+  const {
+    login,
+    loading,
+    register,
+    token,
+    isLoggedIn,
+    setIsLoggedIn,
+    userData,
+    setUserData,
+  } = useAppContext();
   const [image, setImage] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
-
-  const [userData, setUserData] = useState({
-    name: "John Doe",
-    email: "jhndoe@gmail.com",
-    phone: "9876543210",
-    address: {
-      line1: "123, Main Street",
-      line2: "City, State, ZIP",
-    },
-    image: "https://via.placeholder.com/150",
-    gender: "Male",
-    dob: "1990-01-01",
-  });
 
   const updateUserProfileData = async () => {
     try {
@@ -144,25 +139,11 @@ const Myprofile = () => {
                   type="text"
                   name=""
                   id=""
-                  value={userData.address.line1}
+                  value={userData.address}
                   onChange={(e) =>
                     setUserData((prev) => ({
                       ...prev,
-                      address: { line1: e.target.value },
-                    }))
-                  }
-                  className=" text-sm "
-                />
-                <br />
-                <input
-                  type="text"
-                  name=""
-                  id=""
-                  value={userData.address.line2}
-                  onChange={(e) =>
-                    setUserData((prev) => ({
-                      ...prev,
-                      address: { line2: e.target.value },
+                      address: e.target.value,
                     }))
                   }
                   className=" text-sm "
@@ -170,9 +151,8 @@ const Myprofile = () => {
               </p>
             ) : (
               <p className=" text-sm ">
-                {userData.address.line1}
+                {userData.address}
                 <br />
-                {userData.address.line2}
               </p>
             )}
           </div>

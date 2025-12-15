@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 const AppContext = createContext();
 
@@ -12,6 +13,8 @@ export const AppProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(
     !!localStorage.getItem("CIVIRA_token")
   );
+
+  const [userData, setUserData] = useState(false);
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -62,9 +65,36 @@ export const AppProvider = ({ children }) => {
     localStorage.removeItem("CIVIRA_token");
   };
 
+  // GET PROFILE
+  const getProfile = async () => {
+    try {
+      const user = await axios.get(API_BASE_URL + "api/user/get-profile", {
+        headers: { authorization: `Bearer ${token}` },
+      });
+      console.log("Get profile user data", user);
+
+      if (user) {
+        setUserData(user.data.user);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log("Get profile error", error);
+      toast.error(error.message);
+    }
+  };
+
   // When token chnages, update isLoggedIn
   useEffect(() => {
     setIsLoggedIn(!!token);
+  }, [token]);
+
+  useEffect(() => {
+    if (token) {
+      getProfile();
+    } else {
+      setUserData(false);
+    }
   }, [token]);
 
   return (
@@ -78,6 +108,8 @@ export const AppProvider = ({ children }) => {
         logout,
         isLoggedIn,
         setIsLoggedIn,
+        userData,
+        setUserData,
       }}
     >
       {children}
