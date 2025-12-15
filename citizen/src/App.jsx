@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
-import { RegisterComplaints } from "./pages/RegisterComplaints";
+import RegisterComplaints from "./pages/RegisterComplaints";
 import { MyComplaints } from "./pages/MyComplaints";
 import { ComplaintDetails } from "./pages/ComplaintDetails";
 import { Auth } from "./pages/Auth";
