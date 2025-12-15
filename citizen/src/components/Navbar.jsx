@@ -9,13 +9,15 @@ import { RxDashboard } from "react-icons/rx";
 import { CgProfile } from "react-icons/cg";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { RxCrossCircled } from "react-icons/rx";
+import { useAppContext } from "../context/AppContext.jsx";
+import { toast } from "react-toastify";
 
 const Navbar = () => {
   // TEMP: replace later with auth state (context / redux)
 
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [openProfile, setOpenProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isLoggedIn, setIsLoggedIn, logout } = useAppContext();
 
   const navLinkClass = ({ isActive }) =>
     isActive
@@ -101,8 +103,9 @@ const Navbar = () => {
                   <button
                     onClick={() => {
                       setOpenProfile(false);
-                      setIsLoggedIn(false); // TEMP: replace later with actual logout logic
-                      console.log("Logout clicked");
+                      setIsLoggedIn(false);
+                      logout();
+                      toast.success("Logged out successfully");
                     }}
                     className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"
                   >
@@ -113,7 +116,7 @@ const Navbar = () => {
             </>
           ) : (
             <NavLink
-              to="/login"
+              to="/auth"
               className="bg-white text-[#007EC5] px-4 py-2 rounded-lg font-semibold hover:bg-blue-50 transition"
             >
               Login
@@ -160,7 +163,7 @@ const Navbar = () => {
                 <button className="text-left text-red-200">Logout</button>
               </>
             ) : (
-              <NavLink to="/login">Login</NavLink>
+              <NavLink to="/auth">Login</NavLink>
             )}
           </ul>
         </div>
