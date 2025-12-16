@@ -110,6 +110,7 @@ export const AppProvider = ({ children }) => {
         setIsLoggedIn,
         userData,
         setUserData,
+        getProfile,
       }}
     >
       {children}

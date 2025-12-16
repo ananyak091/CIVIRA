@@ -18,9 +18,24 @@ const Myprofile = () => {
     setIsLoggedIn,
     userData,
     setUserData,
+    getProfile,
   } = useAppContext();
   const [image, setImage] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
+
+  const handleDeleteImage = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!confirm("Remove profile image?")) return;
+
+    setImage(null);
+    setUserData((prev) => ({
+      ...prev,
+      image:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR5lBotWQqAFbWNJ11sk-1J_cACWsEWp9k_uA&s",
+    }));
+  };
 
   const updateUserProfileData = async () => {
     try {
@@ -29,20 +44,26 @@ const Myprofile = () => {
       formData.append("phone", userData.phone);
       formData.append("address", JSON.stringify(userData.address));
       formData.append("gender", userData.gender);
-      formData.append("dob", userData.dob);
+      formData.append("dob", userData.dob ? userData.dob : null);
+      // ✅ Image logic
+      if (image) {
+        formData.append("image", image); // new image
+      } else {
+        formData.append("removeImage", "true"); // tell backend to delete
+      }
 
-      image && formData.append("imageFile", image);
+      console.log("formdata", formData);
       const { data } = await axios.post(
         backendurl + "api/user/update-profile",
         formData,
         {
-          headers: { token: `Bearer ${token}` },
+          headers: { authorization: `Bearer ${token}` },
         }
       );
 
       if (data.success) {
         toast.success(data.message);
-        // await loadUserProfileData();
+        await getProfile();
         setIsEdit(false);
         setImage(false);
       } else {
@@ -78,6 +99,7 @@ const Myprofile = () => {
                 hidden
                 id="image"
               />
+              <button onClick={handleDeleteImage}>delete</button>
             </label>
           ) : (
             <img
@@ -183,7 +205,7 @@ const Myprofile = () => {
             <p>Birthday:</p>
             {isEdit ? (
               <input
-                type="datetime"
+                type="date"
                 name=""
                 id=""
                 value={userData.dob}
@@ -193,10 +215,17 @@ const Myprofile = () => {
                     dob: e.target.value,
                   }))
                 }
+                max={new Date().toISOString().split("T")[0]}
                 className=" text-sm "
               />
             ) : (
-              <p className=" text-sm ">{userData.dob}</p>
+              <p className="text-sm">
+                {new Date(userData.dob).toLocaleDateString("en-IN", {
+                  day: "2-digit",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </p>
             )}
           </div>
         </div>

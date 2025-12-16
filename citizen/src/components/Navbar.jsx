@@ -1,7 +1,7 @@
 // Navbar component for citizen portal --> BY SOURAV MAHATA
 
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/asset.js";
 import { FaRegPlusSquare } from "react-icons/fa";
 import { IoMdNotifications } from "react-icons/io";
@@ -18,6 +18,7 @@ const Navbar = () => {
   const [openProfile, setOpenProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isLoggedIn, setIsLoggedIn, logout } = useAppContext();
+  const navigate = useNavigate();
 
   const navLinkClass = ({ isActive }) =>
     isActive
@@ -105,6 +106,7 @@ const Navbar = () => {
                       setOpenProfile(false);
                       setIsLoggedIn(false);
                       logout();
+                      navigate("/auth");
                       toast.success("Logged out successfully");
                     }}
                     className="w-full text-left px-4 py-2 text-red-600 hover:bg-red-50"

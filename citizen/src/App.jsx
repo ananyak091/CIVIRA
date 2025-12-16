@@ -11,6 +11,8 @@ import Footer from "./components/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Profile from "./pages/Profile";
+import ProtectedRoute from "./routes/protectedRoute";
+import NotFound from "./pages/NotFounPage";
 
 const App = () => {
   return (
@@ -20,11 +22,40 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/register-complaints" element={<RegisterComplaints />} />
-        <Route path="/my-complaints" element={<MyComplaints />} />
-        <Route path="/complaint-details" element={<ComplaintDetails />} />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute>
+              <Profile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/register-complaints"
+          element={
+            <ProtectedRoute>
+              <RegisterComplaints />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/my-complaints"
+          element={
+            <ProtectedRoute>
+              <MyComplaints />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/complaint-details"
+          element={
+            <ProtectedRoute>
+              <ComplaintDetails />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/auth" element={<Auth />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <div>
         <Footer></Footer>
