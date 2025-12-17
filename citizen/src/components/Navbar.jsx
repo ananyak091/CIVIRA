@@ -162,7 +162,18 @@ const Navbar = () => {
               <>
                 <NavLink to="/profile">Your Profile</NavLink>
                 <NavLink to="/my-complaints">Your Complaints</NavLink>
-                <button className="text-left text-red-200">Logout</button>
+                <button
+                  className="text-left text-red-200"
+                  onClick={() => {
+                    setOpenProfile(false);
+                    setIsLoggedIn(false);
+                    logout();
+                    navigate("/auth");
+                    toast.success("Logged out successfully");
+                  }}
+                >
+                  Logout
+                </button>
               </>
             ) : (
               <NavLink to="/auth">Login</NavLink>
