@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Trash2,
   Route,
@@ -13,10 +14,14 @@ import {
 } from "lucide-react";
 
 const MyComplaints = () => {
+  const navigate = useNavigate();
+
+  // --- State ---
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
   const [status, setStatus] = useState("All");
 
+  // --- Mock Data (later replace with API) ---
   const complaints = [
     {
       id: "1033",
@@ -56,6 +61,7 @@ const MyComplaints = () => {
     },
   ];
 
+  // --- Filtering Logic ---
   const filteredComplaints = useMemo(() => {
     const s = searchTerm.toLowerCase();
     return complaints.filter(
@@ -68,6 +74,7 @@ const MyComplaints = () => {
     );
   }, [searchTerm, category, status]);
 
+  // --- Status Styles ---
   const statusStyles = {
     "In Progress": "bg-amber-100 text-amber-700",
     Pending: "bg-red-100 text-red-700",
@@ -129,49 +136,61 @@ const MyComplaints = () => {
 
         {/* Complaint List */}
         <div className="space-y-4">
-          {filteredComplaints.map((item) => (
-            <div
-              key={item.id}
-              className="grid grid-cols-1 gap-4 p-6 transition bg-white border md:grid-cols-3 border-slate-200 rounded-xl hover:shadow-sm"
-            >
-              <div>
-                <span className="font-mono text-xs font-semibold text-blue-600">
-                  #CIV-{item.id}
-                </span>
-                <div className="flex items-center gap-2 mt-1 text-lg font-semibold">
-                  <span className="text-blue-600">{item.icon}</span>
-                  {item.title}
+          {filteredComplaints.length > 0 ? (
+            filteredComplaints.map((item) => (
+              <div
+                key={item.id}
+                onClick={() => navigate(`/complaints/${item.id}`)}
+                className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-white border border-slate-200 rounded-xl cursor-pointer hover:shadow-md hover:-translate-y-[1px] transition-all"
+              >
+                <div>
+                  <span className="font-mono text-xs font-semibold text-blue-600">
+                    #CIV-{item.id}
+                  </span>
+                  <div className="flex items-center gap-2 mt-1 text-lg font-semibold">
+                    <span className="text-blue-600">{item.icon}</span>
+                    {item.title}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 text-sm text-slate-500">
+                  <MapPin size={16} className="text-blue-500" />
+                  {item.location}
+                </div>
+
+                <div className="flex items-center justify-between gap-3 md:justify-end">
+                  <span className="text-xs text-slate-500">{item.date}</span>
+                  <span
+                    className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1.5 ${
+                      statusStyles[item.status]
+                    }`}
+                  >
+                    {item.status === "In Progress" && (
+                      <Loader2 size={12} className="animate-spin" />
+                    )}
+                    {item.status === "Pending" && <Clock size={12} />}
+                    {item.status === "Resolved" && <CheckCircle2 size={12} />}
+                    {item.status === "Success" && <Star size={12} />}
+                    {item.status}
+                  </span>
                 </div>
               </div>
-
-              <div className="flex items-center gap-2 text-sm text-slate-500">
-                <MapPin size={16} className="text-blue-500" />
-                {item.location}
-              </div>
-
-              <div className="flex items-center justify-between gap-3 md:justify-end">
-                <span className="text-xs text-slate-500">{item.date}</span>
-                <span
-                  className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1.5 ${
-                    statusStyles[item.status]
-                  }`}
-                >
-                  {item.status === "In Progress" && (
-                    <Loader2 size={12} className="animate-spin" />
-                  )}
-                  {item.status === "Pending" && <Clock size={12} />}
-                  {item.status === "Resolved" && <CheckCircle2 size={12} />}
-                  {item.status === "Success" && <Star size={12} />}
-                  {item.status}
-                </span>
-              </div>
+            ))
+          ) : (
+            <div className="py-20 text-center bg-white border border-dashed rounded-2xl border-slate-300">
+              <Search size={40} className="mx-auto mb-4 text-slate-400" />
+              <p className="text-slate-500">
+                No complaints found matching your criteria.
+              </p>
             </div>
-          ))}
+          )}
         </div>
       </main>
     </div>
   );
 };
+
+/* ---------------- Reusable Components ---------------- */
 
 const FilterSelect = ({ label, value, onChange, options }) => (
   <div className="space-y-1.5">
