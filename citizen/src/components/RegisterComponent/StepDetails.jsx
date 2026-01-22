@@ -15,12 +15,13 @@ const StepDetails = ({ formData, onChange, errors }) => {
             errors.category ? "border-red-400" : "border-slate-200"
           }`}
         >
-          <option value="" disabled>
+          <option value="" disabled selected>
             Select Category
           </option>
-          <option value="Sanitation">Sanitation</option>
-          <option value="Roads">Roads</option>
-          <option value="Electric">Electric</option>
+          <option value="Roads">Potholes</option>
+          <option value="Sanitation">Garbage</option>
+          <option value="Electricity">Street Light / Electric</option>
+          <option value="Drainage">Drainage / Sewage</option>
         </select>
 
         <input

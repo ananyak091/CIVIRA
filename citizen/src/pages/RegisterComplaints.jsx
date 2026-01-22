@@ -1,10 +1,8 @@
 import React, { useState } from "react";
 import { Loader2, Send, ArrowRight } from "lucide-react";
-
 import ProgressBar from "../components/RegisterComponent/ProgressBar";
 import CameraOverlay from "../components/RegisterComponent/CameraOverlay";
 import SuccessModal from "../components/RegisterComponent/SuccessModal";
-
 import StepEvidence from "../components/RegisterComponent/StepEvidence";
 import StepLocation from "../components/RegisterComponent/StepLocation";
 import StepDetails from "../components/RegisterComponent/StepDetails";

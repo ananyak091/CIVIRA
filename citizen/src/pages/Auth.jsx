@@ -74,10 +74,7 @@ const Auth = () => {
           <p className="text-2xl font-semibold">
             {state === "signup" ? "Create Account" : "Login"}
           </p>
-          <p>
-            Please {state === "signup" ? "sign up" : "log in"} to book
-            appointment
-          </p>
+          <p>Please {state === "signup" ? "sign up" : "log in"} to Continue</p>
           {state === "signup" && (
             <div className="w-full">
               <p>Full Name</p>

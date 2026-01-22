@@ -61,7 +61,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/notifications"
           element={
@@ -70,7 +69,6 @@ const App = () => {
             </ProtectedRoute>
           }
         />
-
         <Route path="/auth" element={<Auth />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
