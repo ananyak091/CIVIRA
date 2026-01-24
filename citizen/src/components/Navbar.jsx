@@ -17,7 +17,9 @@ const Navbar = () => {
 
   const [openProfile, setOpenProfile] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { isLoggedIn, setIsLoggedIn, logout } = useAppContext();
+  const { isLoggedIn, setIsLoggedIn, logout, userData, setUserData } =
+    useAppContext();
+
   const navigate = useNavigate();
 
   const navLinkClass = ({ isActive }) =>
@@ -90,7 +92,16 @@ const Navbar = () => {
                 onClick={() => setOpenProfile(!openProfile)}
                 className="text-white hover:text-blue-100 font-medium flex items-center gap-1 justify-center"
               >
-                <CgProfile size={32} />
+                {userData ? (
+                  <img
+                    className="w-8 h-8 rounded-full object-cover"
+                    src={userData.image}
+                    alt=""
+                    srcset=""
+                  />
+                ) : (
+                  <CgProfile size={32} />
+                )}
               </button>
 
               {/* Profile Dropdown */}

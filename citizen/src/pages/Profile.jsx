@@ -6,6 +6,7 @@ import { FaSave } from "react-icons/fa";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useAppContext } from "../context/AppContext";
+import { RiDeleteBin6Line } from "react-icons/ri";
 
 const Myprofile = () => {
   const backendurl = import.meta.env.VITE_API_BASE_URL;
@@ -24,6 +25,7 @@ const Myprofile = () => {
   const [isEdit, setIsEdit] = useState(false);
 
   const handleDeleteImage = (e) => {
+    // delete profile image function
     e.preventDefault();
     e.stopPropagation();
 
@@ -48,8 +50,6 @@ const Myprofile = () => {
       // ✅ Image logic
       if (image) {
         formData.append("image", image); // new image
-      } else {
-        formData.append("removeImage", "true"); // tell backend to delete
       }
 
       console.log("formdata", formData);
@@ -58,7 +58,7 @@ const Myprofile = () => {
         formData,
         {
           headers: { authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (data.success) {
@@ -80,7 +80,7 @@ const Myprofile = () => {
         <div className="flex flex-col gap-4 max-w-[200px]">
           {isEdit ? (
             <label htmlFor="image">
-              <div className="inline-block cursor-pointer relative">
+              <div className="inline-block cursor-pointer relative  ">
                 <img
                   className="w-36 h-36 rounded-lg object-cover   opacity-75"
                   src={image ? URL.createObjectURL(image) : userData.image}
@@ -99,7 +99,9 @@ const Myprofile = () => {
                 hidden
                 id="image"
               />
-              <button onClick={handleDeleteImage}>delete</button>
+              <button onClick={handleDeleteImage}>
+                <RiDeleteBin6Line size={24} />
+              </button>
             </label>
           ) : (
             <img
