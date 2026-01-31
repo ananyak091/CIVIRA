@@ -14,6 +14,7 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./routes/protectedRoute";
 import NotFound from "./pages/NotFounPage";
 import Notifications from "./pages/Notifications";
+import Officer from "./pages/Officer/Officer";
 
 const App = () => {
   return (
@@ -71,6 +72,7 @@ const App = () => {
           }
         />
         <Route path="/auth" element={<Auth />} />
+        <Route path="/officer/login" element={<Officer />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
 

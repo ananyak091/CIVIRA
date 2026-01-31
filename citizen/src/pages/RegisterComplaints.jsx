@@ -7,6 +7,8 @@ import StepEvidence from "../components/RegisterComponent/StepEvidence";
 import StepLocation from "../components/RegisterComponent/StepLocation";
 import StepDetails from "../components/RegisterComponent/StepDetails";
 import StepReview from "../components/RegisterComponent/StepReview";
+import { GrValidate } from "react-icons/gr";
+import { useRegisterComplaintContext } from "../context/RegisterComplaintContext";
 
 /* ---------- Helper Utility ---------- */
 const dataURLtoBlob = (dataurl) => {
@@ -27,26 +29,34 @@ const dataURLtoBlob = (dataurl) => {
 };
 
 const RegisterComplaints = () => {
-  /* ---------- Global State ---------- */
-  const [step, setStep] = useState(1);
-  const totalSteps = 4;
+  // useAppContext data is here ...
+  const {
+    handelImageValidation,
+    captures,
+    setCaptures,
+    step,
+    setStep,
+    totalSteps,
+    token,
+    setToken,
+    handleNext,
+    validateStep,
+    formData,
+    setFormData,
+    errors,
+    setErrors,
+    handleSubmit,
+    isCameraOpen,
+    setIsCameraOpen,
+    isSubmitting,
+    setIsSubmitting,
+    isSuccess,
+    setIsSuccess,
+    validImages,
+    setValidImages,
+  } = useRegisterComplaintContext();
 
-  const [formData, setFormData] = useState({
-    ward: "",
-    landmark: "",
-    address: "",
-    category: "",
-    description: "",
-    notes: "",
-  });
-
-  const [captures, setCaptures] = useState([]);
-  const [errors, setErrors] = useState({});
-
-  /* ---------- UI State ---------- */
-  const [isCameraOpen, setIsCameraOpen] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  // useState hooks can be added here ...
 
   /* ---------- Handlers ---------- */
   const handleInputChange = (e) => {
@@ -59,7 +69,9 @@ const RegisterComplaints = () => {
     }
   };
 
+  // capture photo function
   const handleCapture = (newCapture) => {
+    if (validImages) return;
     const captureWithBlob = {
       ...newCapture,
       blob: dataURLtoBlob(newCapture.previewUrl),
@@ -69,63 +81,13 @@ const RegisterComplaints = () => {
     setIsCameraOpen(false);
   };
 
+  // remove photo function
   const removePhoto = (id) => {
+    if (validImages) return;
     setCaptures((prev) => prev.filter((c) => c.id !== id));
   };
 
-  /* ---------- Validation ---------- */
-  const validateStep = (currentStep) => {
-    const newErrors = {};
-
-    switch (currentStep) {
-      case 2:
-        if (!formData.ward) newErrors.ward = true;
-        if (!formData.address) newErrors.address = true;
-        break;
-
-      case 3:
-        if (!formData.category) newErrors.category = true;
-        if (!formData.description) newErrors.description = true;
-        break;
-
-      default:
-        break;
-    }
-
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
-      return false;
-    }
-
-    return true;
-  };
-
-  /* ---------- Navigation ---------- */
-  const handleNext = () => {
-    if (step < totalSteps) {
-      if (validateStep(step)) {
-        setStep((prev) => prev + 1);
-      }
-    } else {
-      handleSubmit();
-    }
-  };
-
-  /* ---------- Submit ---------- */
-  const handleSubmit = async () => {
-    try {
-      setIsSubmitting(true);
-      console.log("Submitting:", formData, captures);
-
-      await new Promise((res) => setTimeout(res, 2000));
-      setIsSuccess(true);
-    } catch (err) {
-      console.error("Submission failed:", err);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+  // Reset Form
   const resetForm = () => {
     setStep(1);
     setFormData({
@@ -143,8 +105,8 @@ const RegisterComplaints = () => {
 
   return (
     <div className="relative flex flex-col min-h-screen overflow-x-hidden font-sans bg-slate-50 text-slate-800">
-      {/* Camera Overlay */}
-      {isCameraOpen && (
+      {/* Camera Overlay means staring camera open camera  */}
+      {isCameraOpen && !validImages && (
         <CameraOverlay
           onCapture={handleCapture}
           onClose={() => setIsCameraOpen(false)}
@@ -157,8 +119,9 @@ const RegisterComplaints = () => {
 
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-4xl px-6 mx-auto mt-10 mb-20">
+        {/* this is ProgressBar */}
         <ProgressBar currentStep={step} totalSteps={totalSteps} />
-
+        {/* this is the main box */}
         <div className="bg-white/70 backdrop-blur-xl border border-white shadow-xl rounded-3xl p-6 md:p-10 min-h-[450px]">
           {step === 1 && (
             <StepEvidence
@@ -209,7 +172,9 @@ const RegisterComplaints = () => {
               className={`px-8 py-3.5 rounded-xl font-bold flex items-center gap-3 shadow-lg transition-all ${
                 step === totalSteps
                   ? "bg-emerald-500 hover:bg-emerald-600 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                  : step === 1 && !validImages
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
               {isSubmitting ? (
@@ -221,6 +186,11 @@ const RegisterComplaints = () => {
                 <>
                   <Send size={18} />
                   Submit Report
+                </>
+              ) : step === 1 && !validImages ? (
+                <>
+                  <GrValidate size={18} />
+                  Validate your Photos
                 </>
               ) : (
                 <>

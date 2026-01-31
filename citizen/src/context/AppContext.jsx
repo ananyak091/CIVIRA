@@ -7,11 +7,11 @@ const AppContext = createContext();
 export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(
-    localStorage.getItem("CIVIRA_token") || null
+    localStorage.getItem("CIVIRA_token") || null,
   );
   const [loading, setLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(
-    !!localStorage.getItem("CIVIRA_token")
+    !!localStorage.getItem("CIVIRA_token"),
   );
 
   const [userData, setUserData] = useState(false);

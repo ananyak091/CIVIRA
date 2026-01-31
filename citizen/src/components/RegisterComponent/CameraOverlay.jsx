@@ -55,7 +55,7 @@ const CameraOverlay = ({ onCapture, onClose }) => {
             });
           },
           (err) => console.warn("GPS Error", err),
-          { enableHighAccuracy: true, maximumAge: 0 }
+          { enableHighAccuracy: true, maximumAge: 0 },
         );
       }
     };

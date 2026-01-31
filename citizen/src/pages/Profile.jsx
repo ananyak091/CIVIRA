@@ -50,6 +50,8 @@ const Myprofile = () => {
       // ✅ Image logic
       if (image) {
         formData.append("image", image); // new image
+      } else if (image === null) {
+        formData.append("removeImage", true); // remove image
       }
 
       console.log("formdata", formData);
