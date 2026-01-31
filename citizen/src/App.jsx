@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import ProtectedRoute from "./routes/protectedRoute";
 import NotFound from "./pages/NotFounPage";
 import Notifications from "./pages/Notifications";
-import Officer from "./pages/Officer/Officer";
+import Officer from "./pages/officer/Officer";
 
 const App = () => {
   return (

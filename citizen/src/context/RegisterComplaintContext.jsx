@@ -146,28 +146,30 @@ export const AppProvider2 = ({ children }) => {
   return (
     <RegisterComplaintContext.Provider
       value={{
-        handelImageValidation,
-        captures,
-        setCaptures,
-        step,
-        setStep,
-        totalSteps,
         token,
         setToken,
-        handleNext,
-        validateStep,
+        captures,
+        setCaptures,
         formData,
         setFormData,
         errors,
         setErrors,
+        step,
+        setStep,
+        totalSteps,
+
+        handelImageValidation,
+        validateStep,
         handleSubmit,
+
+        validImages,
+        setValidImages,
+
         isCameraOpen,
         setIsCameraOpen,
         isSubmitting,
         isSuccess,
         setIsSuccess,
-        validImages,
-        setValidImages,
       }}
     >
       {children}
