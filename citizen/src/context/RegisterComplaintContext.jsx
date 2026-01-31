@@ -127,6 +127,7 @@ export const AppProvider2 = ({ children }) => {
   /* ---------- Navigation ---------- */
   const handleNext = () => {
     if (step === 1 && !validImages) {
+      console.log("Validating images...");
       handelImageValidation();
 
       return;
@@ -170,6 +171,7 @@ export const AppProvider2 = ({ children }) => {
         isSubmitting,
         isSuccess,
         setIsSuccess,
+        handleNext,
       }}
     >
       {children}
