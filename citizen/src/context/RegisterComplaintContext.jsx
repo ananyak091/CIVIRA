@@ -6,7 +6,7 @@ const RegisterComplaintContext = createContext();
 
 export const AppProvider2 = ({ children }) => {
   const [token, setToken] = useState(
-    localStorage.getItem("CIVIRA_token") || null
+    localStorage.getItem("CIVIRA_token") || null,
   );
   const [captures, setCaptures] = useState([]);
   const [step, setStep] = useState(1);
@@ -67,7 +67,7 @@ export const AppProvider2 = ({ children }) => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
 
       console.log("All images valid:", response.data);
@@ -94,6 +94,7 @@ export const AppProvider2 = ({ children }) => {
       case 2:
         if (!formData.ward) newErrors.ward = true;
         if (!formData.address) newErrors.address = true;
+        if (!formData.landmark) newErrors.landmark = true;
         break;
 
       case 3:

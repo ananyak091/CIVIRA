@@ -104,6 +104,7 @@ const RegisterComplaints = () => {
     setCaptures([]);
     setErrors({});
     setIsSuccess(false);
+    setValidImages(false);
   };
 
   return (
@@ -175,8 +176,8 @@ const RegisterComplaints = () => {
                 step === totalSteps
                   ? "bg-emerald-500 hover:bg-emerald-600 text-white"
                   : step === 1 && !validImages
-                  ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                    : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
               {isSubmitting ? (

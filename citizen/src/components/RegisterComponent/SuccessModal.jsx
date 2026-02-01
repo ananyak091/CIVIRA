@@ -1,9 +1,19 @@
 import React from "react";
 import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useRegisterComplaintContext } from "../../context/RegisterComplaintContext";
 
-const SuccessModal = () => {
+const SuccessModal = ({ onClose }) => {
   const navigate = useNavigate();
+
+  const handleSubmitAnother = () => {
+    onClose();
+    navigate("/register-complaints");
+  };
+  const handleMyComplaints = () => {
+    onClose();
+    navigate("/my-complaints");
+  };
   return (
     <div className="fixed inset-0 z-[100] bg-slate-900/20 backdrop-blur-md flex items-center justify-center p-4">
       <div className="w-full max-w-sm p-12 text-center bg-white shadow-2xl rounded-3xl animate-in zoom-in-95">
@@ -17,10 +27,16 @@ const SuccessModal = () => {
           Data successfully uploaded via FormData.
         </p>
         <button
-          onClick={() => navigate("/my-complaints")}
+          onClick={handleMyComplaints}
           className="w-full py-3.5 rounded-xl font-bold bg-slate-900 text-white"
         >
           View My Complaints
+        </button>
+        <button
+          onClick={handleSubmitAnother}
+          className="w-full py-3.5 rounded-xl font-bold bg-slate-900 text-white"
+        >
+          Submit Another Report
         </button>
       </div>
     </div>
