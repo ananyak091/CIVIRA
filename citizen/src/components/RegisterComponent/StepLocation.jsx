@@ -9,6 +9,7 @@ import {
 import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
+import { useRegisterComplaintContext } from "../../context/RegisterComplaintContext";
 
 /* ---------- Marker Icon (animated via global CSS) ---------- */
 const dropIcon = new L.DivIcon({
@@ -36,10 +37,6 @@ const MapController = ({ target }) => {
 
   return null;
 };
-import React, { useState } from "react";
-import { Check, Crosshair, Loader2, MapPin, AlertCircle } from "lucide-react";
-import { ReceiptIndianRupee } from "lucide-react";
-import { useRegisterComplaintContext } from "../../context/RegisterComplaintContext";
 
 const StepLocation = ({
   onChange,
