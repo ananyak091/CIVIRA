@@ -1,6 +1,8 @@
 import React from "react";
+import { useRegisterComplaintContext } from "../../context/RegisterComplaintContext";
 
-const StepDetails = ({ formData, onChange, errors }) => {
+const StepDetails = ({ onChange, errors }) => {
+  const { formData, setFormData } = useRegisterComplaintContext();
   return (
     <div className="duration-500 animate-in fade-in slide-in-from-right-8">
       <h2 className="mb-6 text-2xl font-bold md:text-3xl text-slate-800">
@@ -18,9 +20,9 @@ const StepDetails = ({ formData, onChange, errors }) => {
           <option value="" disabled selected>
             Select Category
           </option>
-          <option value="Roads">Potholes</option>
-          <option value="Sanitation">Garbage</option>
-          <option value="Electricity">Street Light / Electric</option>
+          <option value="Potholes">Potholes</option>
+          <option value="Garbage">Garbage</option>
+          <option value="Street Light">Street Light / Electric</option>
           <option value="Drainage">Drainage / Sewage</option>
         </select>
 

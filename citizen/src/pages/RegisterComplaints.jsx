@@ -117,7 +117,10 @@ const RegisterComplaints = () => {
         />
       )}
       {isLoading && (
-        <FullScreenLoader show={isLoading} title={"Validating Images..."} />
+        <FullScreenLoader
+          show={isLoading}
+          title={"Image is verifying by AI..."}
+        />
       )}
       {/* Success Modal */}
       {isSuccess && <SuccessModal onClose={resetForm} />}
@@ -138,24 +141,18 @@ const RegisterComplaints = () => {
 
           {step === 2 && (
             <StepLocation
-              formData={formData}
               onChange={handleInputChange}
               errors={errors}
               captures={captures}
-              setFormData={setFormData}
               setErrors={setErrors}
             />
           )}
 
           {step === 3 && (
-            <StepDetails
-              formData={formData}
-              onChange={handleInputChange}
-              errors={errors}
-            />
+            <StepDetails onChange={handleInputChange} errors={errors} />
           )}
 
-          {step === 4 && <StepReview formData={formData} captures={captures} />}
+          {step === 4 && <StepReview captures={captures} />}
 
           {/* Navigation Buttons */}
           <div className="flex justify-between mt-10">
@@ -178,8 +175,8 @@ const RegisterComplaints = () => {
                 step === totalSteps
                   ? "bg-emerald-500 hover:bg-emerald-600 text-white"
                   : step === 1 && !validImages
-                    ? "bg-yellow-500 hover:bg-yellow-600 text-white"
-                    : "bg-blue-600 hover:bg-blue-700 text-white"
+                  ? "bg-yellow-500 hover:bg-yellow-600 text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white"
               }`}
             >
               {isSubmitting ? (

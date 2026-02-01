@@ -6,7 +6,7 @@ const RegisterComplaintContext = createContext();
 
 export const AppProvider2 = ({ children }) => {
   const [token, setToken] = useState(
-    localStorage.getItem("CIVIRA_token") || null,
+    localStorage.getItem("CIVIRA_token") || null
   );
   const [captures, setCaptures] = useState([]);
   const [step, setStep] = useState(1);
@@ -46,29 +46,6 @@ export const AppProvider2 = ({ children }) => {
     return config;
   });
 
-  // 🔥 Global Loading Start
-  api.interceptors.request.use(
-    (config) => {
-      setIsLoading(true);
-      return config;
-    },
-    (error) => {
-      setIsLoading(false);
-      return Promise.reject(error);
-    },
-  );
-
-  // 🔥 Global Loading End
-  api.interceptors.response.use(
-    (response) => {
-      setIsLoading(false);
-      return response;
-    },
-    (error) => {
-      setIsLoading(false);
-      return Promise.reject(error);
-    },
-  );
   // handel image validation api call function
 
   const handelImageValidation = async () => {
@@ -77,6 +54,7 @@ export const AppProvider2 = ({ children }) => {
         toast.error("Please add at least one photo as evidence.");
         return false;
       }
+      setIsLoading(true);
 
       const formData = new FormData();
       captures.forEach((capture, index) => {
@@ -89,11 +67,12 @@ export const AppProvider2 = ({ children }) => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
 
       console.log("All images valid:", response.data);
       setValidImages(response.data.allValid);
+      setIsLoading(false);
 
       if (response.data.allValid) {
         toast.success("Images validated successfully.");
@@ -140,7 +119,48 @@ export const AppProvider2 = ({ children }) => {
       setIsSubmitting(true);
       console.log("Submitting:", formData, captures);
 
-      await new Promise((res) => setTimeout(res, 2000));
+      const fd = new FormData();
+
+      /* ----------------------------------
+       1️⃣ Add JSON data from formData
+    ----------------------------------- */
+      fd.append("data", JSON.stringify(formData));
+
+      /* ----------------------------------
+       2️⃣ Add metadata for each image
+    ----------------------------------- */
+      const metaData = captures.map((c) => ({
+        lat: c.lat,
+        lng: c.lng,
+        accuracy: c.accuracy,
+        timestamp: c.timestamp,
+        isoTime: c.isoTime,
+      }));
+
+      fd.append("meta", JSON.stringify(metaData));
+
+      /* ----------------------------------
+       3️⃣ Add images (Blob files)
+    ----------------------------------- */
+      captures.forEach((item, index) => {
+        fd.append("images", item.blob, `evidence_${index}.jpg`);
+      });
+
+      /* ----------------------------------
+       4️⃣ API Submission
+    ----------------------------------- */
+      const response = await api.post(`/api/user/register-complaint`, fd, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      console.log("Response:", response.data);
+      if (response.success) {
+        toast.success(response.message);
+      } else {
+        toast.error(response.error);
+      }
       setIsSuccess(true);
     } catch (err) {
       console.error("Submission failed:", err);
