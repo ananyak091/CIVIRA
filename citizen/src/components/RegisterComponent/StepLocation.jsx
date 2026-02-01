@@ -1,3 +1,41 @@
+import React, { useEffect, useState } from "react";
+import {
+  Crosshair,
+  Loader2,
+  MapPin,
+  AlertCircle,
+  RotateCcw,
+} from "lucide-react";
+import { MapContainer, TileLayer, Marker, useMap } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+
+/* ---------- Marker Icon (animated via global CSS) ---------- */
+const dropIcon = new L.DivIcon({
+  className: "custom-drop-marker",
+  html: `<div class="marker-drop"></div>`,
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
+});
+
+const DEFAULT_CENTER = [20.5937, 78.9629]; // India
+const DEFAULT_ZOOM = 4;
+
+/* ---------- Map Controller (single responsibility) ---------- */
+const MapController = ({ target }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    if (!target) return;
+
+    map.flyTo(target.center, target.zoom, {
+      duration: target.duration ?? 2.4,
+      easeLinearity: target.easeLinearity ?? 0.25,
+    });
+  }, [target, map]);
+
+  return null;
+};
 import React, { useState } from "react";
 import { Check, Crosshair, Loader2, MapPin, AlertCircle } from "lucide-react";
 import { ReceiptIndianRupee } from "lucide-react";
@@ -10,85 +48,70 @@ const StepLocation = ({
 
   setErrors,
 }) => {
-  const [gpsLocked, setGpsLocked] = useState(false);
   const [isDetecting, setIsDetecting] = useState(false);
   const [detectError, setDetectError] = useState(null);
 
+  const [mapTarget, setMapTarget] = useState(null); // controls animation
+  const [markerPos, setMarkerPos] = useState(null); // controls marker
+  const [locationLocked, setLocationLocked] = useState(false);
+
+  /* ---------- Reverse Geocoding ---------- */
   const { formData, setFormData } = useRegisterComplaintContext();
 
   // --- 1. Real Reverse Geocoding Function ---
   const fetchAddressFromCoords = async (lat, lng) => {
     try {
-      // Using OpenStreetMap (Nominatim) Free API
-      const response = await fetch(
+      const res = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`,
         {
           headers: {
-            // Nominatim requires a User-Agent to identify the app
-            "User-Agent": "Civira-Report-App/1.0",
+            "User-Agent": "Civira-Report-App/1.0 (support@civira.app)",
           },
-        }
+        },
       );
 
-      if (!response.ok) throw new Error("Failed to fetch address");
+      if (!res.ok) throw new Error("Failed");
 
-      const data = await response.json();
-      const addr = data.address;
-
-      // --- 2. Smart Mapping Logic ---
-      // We map available OSM tags to your specific fields
-
-      // WARD NO: Best guess is 'neighbourhood', 'suburb', or 'residential'
-      const detectedWard =
-        addr.neighbourhood ||
-        addr.suburb ||
-        addr.residential ||
-        addr.village ||
-        "";
-
-      // LANDMARK: Look for 'amenity', 'building', or 'shop'
-      // If the location itself is a shop/amenity, use its name (data.name)
-      // Otherwise, check typical landmark fields
-      const detectedLandmark =
-        data.name ||
-        addr.amenity ||
-        addr.shop ||
-        addr.building ||
-        addr.tourism ||
-        "";
-
-      // STREET ADDRESS: Combine road + house number
-      const streetPart = addr.road || addr.pedestrian || addr.highway || "";
-      const housePart = addr.house_number ? `${addr.house_number}, ` : "";
-      const cityPart = addr.city || addr.town || addr.county || "";
-      const detectedAddress = `${housePart}${streetPart}, ${cityPart}`;
+      const data = await res.json();
+      const addr = data.address || {};
 
       return {
-        ward: detectedWard,
-        landmark: detectedLandmark,
-        address: detectedAddress,
+        ward:
+          addr.neighbourhood ||
+          addr.suburb ||
+          addr.residential ||
+          addr.village ||
+          "",
+        landmark: data.name || addr.amenity || addr.shop || addr.building || "",
+        address: [
+          `${addr.house_number || ""} ${addr.road || ""}`.trim(),
+          addr.city || addr.town || addr.county || "",
+        ]
+          .filter(Boolean)
+          .join(", "),
       };
-    } catch (err) {
-      console.error("Geocoding failed:", err);
+    } catch {
       return null;
     }
   };
 
+  /* ---------- Detect & Animate Location ---------- */
   const handleAutoFill = async () => {
+    if (isDetecting || locationLocked) return;
+
     setIsDetecting(true);
     setDetectError(null);
 
-    // 1. Get Coordinates (Prefer photo tags, fallback to live browser GPS)
     let lat, lng;
 
-    // Check if we already have coords from the photos (Step 1)
-    const photoWithLoc = captures.find((c) => c.lat);
+    const photoWithLoc = captures?.find(
+      (c) => typeof c.lat === "number" && typeof c.lng === "number",
+    );
 
     if (photoWithLoc) {
       lat = photoWithLoc.lat;
       lng = photoWithLoc.lng;
     } else {
-      // Fallback: Get browser current location if no photo tags
       try {
         const pos = await new Promise((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -97,32 +120,65 @@ const StepLocation = ({
         });
         lat = pos.coords.latitude;
         lng = pos.coords.longitude;
-      } catch (e) {
-        setDetectError("Could not access GPS. Please allow permissions.");
+      } catch {
+        setDetectError("GPS access denied");
         setIsDetecting(false);
         return;
       }
     }
 
-    // 2. Fetch Address Data
+    /* ---------- Animate only if target changed ---------- */
+    if (
+      !mapTarget ||
+      mapTarget.center[0] !== lat ||
+      mapTarget.center[1] !== lng
+    ) {
+      setMarkerPos([lat, lng]);
+      setMapTarget({ center: [lat, lng], zoom: 16 });
+    }
+
     const result = await fetchAddressFromCoords(lat, lng);
 
     if (result) {
       setFormData((prev) => ({
         ...prev,
-        ward: result.ward || prev.ward, // Only overwrite if we found something
-        landmark: result.landmark || prev.landmark,
-        address: result.address || prev.address,
+        ward: result.ward,
+        landmark: result.landmark,
+        address: result.address,
       }));
-
-      // Clear errors since we filled data
       setErrors((prev) => ({ ...prev, ward: null, address: null }));
-      setGpsLocked(true);
+      setLocationLocked(true);
     } else {
-      setDetectError("Address not found. Please enter manually.");
+      setDetectError("Address not found");
     }
 
     setIsDetecting(false);
+  };
+
+  /* ---------- Reset Location (clean & animated) ---------- */
+  const resetLocation = () => {
+    setMarkerPos(null);
+    setMapTarget(null); // clear target first (important)
+
+    // small delay ensures clean re-fly
+    setTimeout(() => {
+      setMapTarget({
+        center: DEFAULT_CENTER,
+        zoom: DEFAULT_ZOOM,
+        duration: 1.4, // faster than forward
+        easeLinearity: 0.4, // softer easing
+      });
+    }, 50);
+
+    setLocationLocked(false);
+    setDetectError(null);
+
+    setFormData((prev) => ({
+      ...prev,
+      ward: "",
+      landmark: "",
+      address: "",
+    }));
   };
 
   return (
@@ -131,93 +187,106 @@ const StepLocation = ({
         Location Data
       </h2>
 
-      {/* Helper Message: Photo Auto-detection */}
-      {captures.some((c) => c.lat) && (
-        <div className="flex items-start gap-3 p-4 mb-6 border bg-emerald-50 border-emerald-100 rounded-xl">
-          <Check className="text-emerald-600 mt-0.5 shrink-0" size={18} />
-          <p className="text-sm text-emerald-800">
-            Coordinates detected from your photos. Click below to fetch the
-            address.
-          </p>
-        </div>
-      )}
-
-      {/* Map / GPS Area */}
-      <div className="h-48 w-full bg-slate-100 rounded-2xl relative overflow-hidden border border-slate-200 mb-6 flex flex-col items-center justify-center bg-[linear-gradient(#cbd5e1_1px,transparent_1px),linear-gradient(90deg,#cbd5e1_1px,transparent_1px)] bg-[size:24px_24px]">
-        <button
-          onClick={handleAutoFill}
-          disabled={isDetecting}
-          className={`
-            bg-white border px-6 py-3 rounded-full shadow-lg flex items-center gap-3 text-sm font-bold transition-all hover:-translate-y-1
-            ${
-              gpsLocked
-                ? "border-emerald-500 text-emerald-600 ring-4 ring-emerald-500/10"
-                : "text-slate-700 hover:text-blue-600 hover:border-blue-300"
-            }
-          `}
+      {/* ---------- MAP ---------- */}
+      <div className="relative w-full h-48 mb-6 overflow-hidden border rounded-2xl bg-slate-100 border-slate-200">
+        <MapContainer
+          center={DEFAULT_CENTER}
+          zoom={DEFAULT_ZOOM}
+          scrollWheelZoom={false}
+          className="w-full h-full"
         >
-          {isDetecting ? (
-            <>
-              <Loader2 className="text-blue-600 animate-spin" size={18} />
-              <span className="text-blue-600">Fetching Address...</span>
-            </>
-          ) : gpsLocked ? (
-            <>
-              <Check size={18} strokeWidth={3} />
-              <span>Address Locked</span>
-            </>
-          ) : (
-            <>
-              <Crosshair size={18} />
-              <span>Use Current Location</span>
-            </>
+          <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+          <MapController target={mapTarget} />
+          {markerPos && <Marker position={markerPos} icon={dropIcon} />}
+        </MapContainer>
+
+        {/* ---------- CONTROLS ---------- */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 z-[400] pointer-events-none">
+          {!locationLocked && (
+            <button
+              type="button"
+              onClick={handleAutoFill}
+              disabled={isDetecting}
+              className="flex items-center justify-center px-6 py-3 transition-all bg-white border rounded-full shadow-xl pointer-events-auto text-slate-700 hover:text-blue-600 active:scale-95"
+            >
+              {isDetecting ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <div className="flex items-center gap-2 text-sm font-bold">
+                  <Crosshair size={18} />
+                  Use Current Location
+                </div>
+              )}
+            </button>
           )}
-        </button>
+
+          {locationLocked && !isDetecting && (
+            <button
+              type="button"
+              onClick={resetLocation}
+              className="flex items-center gap-2 px-4 py-2 mt-20 text-xs font-semibold transition-all border rounded-full shadow-md pointer-events-auto text-slate-600 hover:text-red-600 bg-white/90 border-slate-100"
+            >
+              <RotateCcw size={14} />
+              Reset
+            </button>
+          )}
+        </div>
 
         {detectError && (
-          <div className="absolute bottom-4 flex items-center gap-2 text-xs text-red-500 font-medium bg-white/90 px-3 py-1.5 rounded-full shadow-sm animate-in fade-in slide-in-from-bottom-2">
-            <AlertCircle size={14} /> {detectError}
+          <div
+            className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2
+                       text-xs text-red-500 font-medium bg-white/95 border border-red-100
+                       px-3 py-2 rounded-full shadow-lg z-[401]"
+          >
+            <AlertCircle size={14} />
+            {detectError}
           </div>
         )}
       </div>
 
-      {/* Form Fields */}
+      {/* ---------- FORM ---------- */}
       <div className="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
-        <div className="relative group">
+        <div className="relative">
           <input
             name="ward"
             value={formData.ward}
             onChange={onChange}
+            disabled={locationLocked}
             placeholder="Ward No / Area"
-            className={`w-full bg-slate-50 border rounded-xl p-4 outline-none focus:bg-white focus:border-blue-500 transition-all ${
-              errors.ward ? "border-red-400 bg-red-50" : "border-slate-200"
-            }`}
+            className={`w-full bg-slate-50 border rounded-xl p-4 pr-12
+                        focus:ring-2 focus:ring-blue-500 outline-none ${
+                          errors.ward
+                            ? "border-red-400 bg-red-50"
+                            : "border-slate-200"
+                        }`}
           />
-          {/* Tooltip for Ward */}
-          <span className="absolute -translate-y-1/2 pointer-events-none right-4 top-1/2 text-slate-400">
+          <span className="absolute -translate-y-1/2 right-4 top-1/2 text-slate-400">
             <MapPin size={18} />
           </span>
         </div>
 
-        <div className="relative">
-          <input
-            name="landmark"
-            value={formData.landmark}
-            onChange={onChange}
-            placeholder="Nearest Landmark"
-            className="w-full p-4 transition-all border outline-none bg-slate-50 border-slate-200 rounded-xl focus:bg-white focus:border-blue-500"
-          />
-        </div>
+        <input
+          name="landmark"
+          value={formData.landmark}
+          onChange={onChange}
+          disabled={locationLocked}
+          placeholder="Nearest Landmark"
+          className="w-full p-4 border bg-slate-50 border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+        />
       </div>
 
       <input
         name="address"
         value={formData.address}
         onChange={onChange}
+        disabled={locationLocked}
         placeholder="Specific Street Address"
-        className={`w-full bg-slate-50 border rounded-xl p-4 outline-none focus:bg-white focus:border-blue-500 transition-all ${
-          errors.address ? "border-red-400 bg-red-50" : "border-slate-200"
-        }`}
+        className={`w-full bg-slate-50 border rounded-xl p-4
+                    focus:ring-2 focus:ring-blue-500 outline-none ${
+                      errors.address
+                        ? "border-red-400 bg-red-50"
+                        : "border-slate-200"
+                    }`}
       />
     </div>
   );
