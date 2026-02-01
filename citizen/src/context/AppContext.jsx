@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const AppContext = createContext();
 
@@ -15,6 +16,11 @@ export const AppProvider = ({ children }) => {
   );
 
   const [userData, setUserData] = useState(false);
+  const [complaintsData, setComplaintsData] = useState([]);
+  const [complaintDetails, setComplaintDetails] = useState([]);
+  const [evidence, setEvidence] = useState([]);
+
+  const navigate = useNavigate();
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -84,6 +90,57 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // GET MY COMPLAINTS
+  const getMyComplaints = async () => {
+    try {
+      const complaints = await axios.get(
+        API_BASE_URL + "api/user/my-complaints",
+        {
+          headers: { authorization: `Bearer ${token}` },
+        },
+      );
+      console.log("Get my complaints data", complaints);
+
+      if (complaints) {
+        setComplaintsData(complaints.data.complaints);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log("Get Complaints error", error);
+      toast.error(error.message);
+    }
+  };
+
+  const handleComplaintDetails = async (id) => {
+    try {
+      console.log("Before Navigate in complaint details");
+
+      console.log("After Navigate in complaint details");
+      const complaintDetails = await axios.get(
+        `${API_BASE_URL}api/user/my-complaints/${id}`,
+        {
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      console.log("API Called", complaintDetails);
+
+      if (complaintDetails.data.success) {
+        console.log("Get my complaints data", complaintDetails);
+        setComplaintDetails(complaintDetails.data.complaint);
+        setEvidence(complaintDetails.data.evidence);
+        navigate(`/complaints/${id}`);
+      } else {
+        toast.error(complaintDetails.message);
+      }
+    } catch (error) {
+      console.log("Get Complaints error", error);
+      toast.error(error.message);
+    }
+  };
+
   // When token chnages, update isLoggedIn
   useEffect(() => {
     setIsLoggedIn(!!token);
@@ -92,6 +149,7 @@ export const AppProvider = ({ children }) => {
   useEffect(() => {
     if (token) {
       getProfile();
+      getMyComplaints();
     } else {
       setUserData(false);
     }
@@ -111,6 +169,13 @@ export const AppProvider = ({ children }) => {
         userData,
         setUserData,
         getProfile,
+        setComplaintsData,
+        complaintsData,
+        handleComplaintDetails,
+        complaintDetails,
+        setComplaintDetails,
+        evidence,
+        setEvidence,
       }}
     >
       {children}

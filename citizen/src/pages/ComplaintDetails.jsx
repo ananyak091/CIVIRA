@@ -10,12 +10,13 @@ import {
   Building2,
   Image,
 } from "lucide-react";
+import { useAppContext } from "../context/AppContext";
 
 /* ---------------- MOCK DATA ---------------- */
 
 const COMPLAINTS = [
   {
-    id: "1033",
+    id: "697f33d57f5415aae9c25756",
     title: "Garbage Overflow",
     category: "Garbage",
     priority: "High",
@@ -62,15 +63,23 @@ const statusStyles = {
 /* ---------------- COMPONENT ---------------- */
 
 export default function ComplaintDetails() {
+  const { complaintDetails, setComplaintDetails, evidence, setEvidence } =
+    useAppContext();
+
+  const complaintAndEvidence = {
+    complaint: complaintDetails,
+    evidence: evidence,
+  };
+
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const complaint = COMPLAINTS.find((c) => c.id === id);
-  if (!complaint) return null;
+  //const complaint = COMPLAINTS.find((c) => c.id === id);
+  if (!complaintAndEvidence) return null;
 
-  const currentIndex = complaint.timeline.findIndex(
-    (t) => t.key === complaint.status
-  );
+  // const currentIndex = complaint.timeline.findIndex(
+  //   (t) => t.key === complaint.status,
+  // );
 
   return (
     <div className="min-h-screen p-6 bg-slate-50">
@@ -88,8 +97,15 @@ export default function ComplaintDetails() {
         <div className="bg-[#eff6ff] border border-blue-200 rounded-xl p-5">
           <p className="text-sm font-medium text-slate-700">
             This complaint is currently{" "}
-            <span className="font-bold">{complaint.status}</span> by the{" "}
-            <span className="font-bold">{complaint.department}</span>.
+            {console.log("complaint and evdebnce", complaintAndEvidence)}
+            <span className="font-bold">
+              {complaintAndEvidence.complaint.complaint_status}
+            </span>{" "}
+            by the{" "}
+            <span className="font-bold">
+              {complaintAndEvidence.complaint.ward} Department
+            </span>
+            .
           </p>
         </div>
 
@@ -99,22 +115,22 @@ export default function ComplaintDetails() {
           <div className="flex items-start justify-between">
             <div>
               <p className="font-mono text-xs font-bold text-blue-600">
-                #CIV-{complaint.id}
+                #CIV-{complaintAndEvidence.complaint._id}
               </p>
               <h1 className="mt-1 text-2xl font-bold text-slate-800">
-                {complaint.title}
+                Category: {complaintAndEvidence.complaint.category}
               </h1>
               <p className="mt-1 text-sm text-slate-500">
-                Category: {complaint.category}
+                Notes: {complaintAndEvidence.complaint.additional_notes}
               </p>
             </div>
 
             <span
               className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${
-                statusStyles[complaint.status]
+                statusStyles[complaintAndEvidence.complaint.complaint_status]
               }`}
             >
-              {complaint.status}
+              {complaintAndEvidence.complaint.complaint_status}
             </span>
           </div>
 
@@ -122,19 +138,19 @@ export default function ComplaintDetails() {
           <div className="grid gap-4 md:grid-cols-2 text-slate-600">
             <div className="flex items-center gap-2">
               <MapPin size={18} className="text-blue-500" />
-              {complaint.location}
+              {complaintAndEvidence.complaint.landmark}
             </div>
             <div className="flex items-center gap-2">
               <Clock size={18} className="text-blue-500" />
-              {complaint.date}
+              {complaintAndEvidence.complaint.date}
             </div>
             <div className="flex items-center gap-2">
               <User size={18} className="text-blue-500" />
-              {complaint.submittedBy}
+              complaintAndEvidence.complaint.submittedBy
             </div>
             <div className="flex items-center gap-2">
               <Building2 size={18} className="text-blue-500" />
-              {complaint.department} (Officer: {complaint.officer})
+              complaint.department Officer: complaint.officer
             </div>
           </div>
 
@@ -144,7 +160,7 @@ export default function ComplaintDetails() {
               Description
             </p>
             <p className="leading-relaxed text-slate-700">
-              {complaint.description}
+              {complaintAndEvidence.complaint.description}
             </p>
           </div>
 
@@ -155,10 +171,10 @@ export default function ComplaintDetails() {
             </p>
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              {complaint.images.map((img, i) => (
+              {complaintAndEvidence.evidence.map((img, i) => (
                 <img
                   key={i}
-                  src={img}
+                  src={img.image_url}
                   alt={`Evidence ${i + 1}`}
                   className="object-cover w-full h-32 border rounded-xl border-slate-200"
                   onError={(e) => {
@@ -170,7 +186,7 @@ export default function ComplaintDetails() {
             </div>
           </div>
 
-          {/* Timeline */}
+          {/* Timeline
           <div>
             <p className="mb-4 text-sm font-bold text-slate-700">
               Complaint Timeline
@@ -190,8 +206,8 @@ export default function ComplaintDetails() {
                         isCompleted
                           ? "bg-blue-600 border-blue-600"
                           : isCurrent
-                          ? "bg-white border-blue-600"
-                          : "bg-white border-slate-300"
+                            ? "bg-white border-blue-600"
+                            : "bg-white border-slate-300"
                       }`}
                     >
                       {isCompleted && (
@@ -215,7 +231,7 @@ export default function ComplaintDetails() {
                 );
               })}
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

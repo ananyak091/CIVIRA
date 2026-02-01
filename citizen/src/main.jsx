@@ -21,12 +21,12 @@ L.Icon.Default.mergeOptions({
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <AppProvider2>
-      <AppProvider>
-        <BrowserRouter>
+    <BrowserRouter>
+      <AppProvider2>
+        <AppProvider>
           <App />
-        </BrowserRouter>
-      </AppProvider>
-    </AppProvider2>
+        </AppProvider>
+      </AppProvider2>
+    </BrowserRouter>
   </StrictMode>,
 );

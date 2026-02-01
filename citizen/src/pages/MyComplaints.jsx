@@ -12,14 +12,20 @@ import {
   Search,
   Loader2,
 } from "lucide-react";
+import { useAppContext } from "../context/AppContext";
 
 const MyComplaints = () => {
+  const { setComplaintsData, complaintsData, handleComplaintDetails } =
+    useAppContext();
+
   const navigate = useNavigate();
 
   // --- State ---
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
   const [status, setStatus] = useState("All");
+
+  // My Complaint API
 
   // --- Mock Data (later replace with API) ---
   const complaints = [
@@ -32,51 +38,25 @@ const MyComplaints = () => {
       date: "12 Jan 2025",
       icon: <Trash2 size={18} />,
     },
-    {
-      id: "1031",
-      title: "Pothole",
-      category: "Pothole",
-      status: "Pending",
-      location: "Ward 08, Main Road",
-      date: "10 Jan 2025",
-      icon: <Route size={18} />,
-    },
-    {
-      id: "1029",
-      title: "Streetlight Failure",
-      category: "Streetlight",
-      status: "Resolved",
-      location: "Ward 06, Market Lane",
-      date: "08 Jan 2025",
-      icon: <Lightbulb size={18} />,
-    },
-    {
-      id: "1027",
-      title: "Drainage Blockage",
-      category: "Drainage",
-      status: "Success",
-      location: "Ward 11, Colony Road",
-      date: "06 Jan 2025",
-      icon: <Droplets size={18} />,
-    },
   ];
 
   // --- Filtering Logic ---
   const filteredComplaints = useMemo(() => {
     const s = searchTerm.toLowerCase();
-    return complaints.filter(
-      (c) =>
-        (c.title.toLowerCase().includes(s) ||
-          c.id.includes(s) ||
-          c.location.toLowerCase().includes(s)) &&
-        (category === "All" || c.category === category) &&
-        (status === "All" || c.status === status)
-    );
-  }, [searchTerm, category, status]);
+    return complaintsData;
+    //.filter(
+    //   (c) =>
+    //     (c.title.toLowerCase().includes(s) ||
+    //       c.id.includes(s) ||
+    //       c.location.toLowerCase().includes(s)) &&
+    //     (category === "All" || c.category === category) &&
+    //     (status === "All" || c.status === status),
+    // );
+  }, [category, status]);
 
   // --- Status Styles ---
   const statusStyles = {
-    "In Progress": "bg-amber-100 text-amber-700",
+    Registered: "bg-amber-100 text-amber-700",
     Pending: "bg-red-100 text-red-700",
     Resolved: "bg-emerald-100 text-emerald-700",
     Success: "bg-emerald-600 text-white",
@@ -89,6 +69,7 @@ const MyComplaints = () => {
         <header className="mb-10 text-center">
           <h1 className="text-4xl font-bold md:text-5xl text-slate-800">
             My Complaints
+            {console.log("My Filtered Complaints data", filteredComplaints)}
           </h1>
           <p className="mt-2 text-slate-500">
             View and track the status of your reported issues
@@ -136,42 +117,46 @@ const MyComplaints = () => {
 
         {/* Complaint List */}
         <div className="space-y-4">
-          {filteredComplaints.length > 0 ? (
-            filteredComplaints.map((item) => (
+          {complaintsData.length > 0 ? (
+            complaintsData.map((item) => (
               <div
-                key={item.id}
-                onClick={() => navigate(`/complaints/${item.id}`)}
+                key={item._id}
+                onClick={() => handleComplaintDetails(item._id)}
                 className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 bg-white border border-slate-200 rounded-xl cursor-pointer hover:shadow-md hover:-translate-y-[1px] transition-all"
               >
                 <div>
                   <span className="font-mono text-xs font-semibold text-blue-600">
-                    #CIV-{item.id}
+                    #CIV-{item._id}
                   </span>
                   <div className="flex items-center gap-2 mt-1 text-lg font-semibold">
                     <span className="text-blue-600">{item.icon}</span>
-                    {item.title}
+                    {item.category}
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2 text-sm text-slate-500">
                   <MapPin size={16} className="text-blue-500" />
-                  {item.location}
+                  {item.address}
                 </div>
 
                 <div className="flex items-center justify-between gap-3 md:justify-end">
-                  <span className="text-xs text-slate-500">{item.date}</span>
+                  <span className="text-xs text-slate-500">
+                    {item.createdAt}
+                  </span>
                   <span
                     className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase flex items-center gap-1.5 ${
-                      statusStyles[item.status]
+                      statusStyles[item.complaint_status]
                     }`}
                   >
-                    {item.status === "In Progress" && (
+                    {item.complaint_status === "Registered" && (
                       <Loader2 size={12} className="animate-spin" />
                     )}
-                    {item.status === "Pending" && <Clock size={12} />}
-                    {item.status === "Resolved" && <CheckCircle2 size={12} />}
-                    {item.status === "Success" && <Star size={12} />}
-                    {item.status}
+                    {item.complaint_status === "Pending" && <Clock size={12} />}
+                    {item.complaint_status === "Resolved" && (
+                      <CheckCircle2 size={12} />
+                    )}
+                    {item.complaint_status === "Success" && <Star size={12} />}
+                    {item.complaint_status}
                   </span>
                 </div>
               </div>
