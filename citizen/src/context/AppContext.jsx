@@ -44,6 +44,8 @@ export const AppProvider = ({ children }) => {
     return config;
   });
 
+  // <==== Authentication start ====>
+
   // REGISTER
   const register = async (formData) => {
     setLoading(true);
@@ -70,6 +72,14 @@ export const AppProvider = ({ children }) => {
       setLoading(false);
     }
   };
+  const forgetPasswordHandler = async () => {
+    if (!email) {
+      toast.error("Please enter your email to reset password");
+      return;
+    }
+    try {
+    } catch (error) {}
+  };
 
   // LOGOUT
   const logout = () => {
@@ -77,6 +87,10 @@ export const AppProvider = ({ children }) => {
     setToken(null);
     localStorage.removeItem("CIVIRA_token");
   };
+
+  // <==== Authentication ends ====>
+
+  // <==== Profile & Others ====>
 
   // GET PROFILE
   const getProfile = async () => {
@@ -227,6 +241,7 @@ export const AppProvider = ({ children }) => {
         setEvidence,
         stats,
         recentComplaints,
+        forgetPasswordHandler,
       }}
     >
       {children}

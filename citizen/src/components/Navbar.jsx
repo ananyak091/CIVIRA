@@ -4,7 +4,12 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { assets } from "../assets/asset.js";
 import { FaRegPlusSquare, FaClipboardList } from "react-icons/fa";
-import { IoIosHome, IoMdLogOut, IoMdNotifications } from "react-icons/io";
+import {
+  IoIosHome,
+  IoMdLogIn,
+  IoMdLogOut,
+  IoMdNotifications,
+} from "react-icons/io";
 import { RxDashboard, RxCrossCircled } from "react-icons/rx";
 import { CgProfile } from "react-icons/cg";
 import { GiHamburgerMenu } from "react-icons/gi";
@@ -93,7 +98,7 @@ const Navbar = () => {
                       onClick={() => setOpenProfile(false)}
                     >
                       <CgProfile />
-                      Your Profile
+                      My Profile
                     </NavLink>
 
                     <hr />
@@ -117,8 +122,9 @@ const Navbar = () => {
             ) : (
               <NavLink
                 to="/auth"
-                className="bg-white text-[#007EC5] px-4 py-2 rounded-lg font-semibold"
+                className="bg-white text-[#007EC5] px-4 py-2 rounded-lg font-semibold flex gap-2 items-center"
               >
+                <IoMdLogIn />
                 Login
               </NavLink>
             )}
@@ -194,30 +200,43 @@ const Navbar = () => {
 
           {isLoggedIn ? (
             <>
-              <NavLink to="/profile" onClick={() => setMobileMenuOpen(false)}>
-                Your Profile
+              <NavLink
+                to="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex gap-2 items-center`}
+              >
+                <CgProfile />
+                My Profile
               </NavLink>
 
               <NavLink
                 to="/my-complaints"
                 onClick={() => setMobileMenuOpen(false)}
+                className={`flex gap-2 items-center`}
               >
-                Your Complaints
+                <FaClipboardList />
+                My Complaints
               </NavLink>
 
               <button
-                className="text-left text-red-200"
+                className="text-left text-red-200 flex gap-2 items-center"
                 onClick={() => {
                   setMobileMenuOpen(false);
                   logout();
                   navigate("/auth");
                 }}
               >
+                <IoMdLogOut />
                 Logout
               </button>
             </>
           ) : (
-            <NavLink to="/auth" onClick={() => setMobileMenuOpen(false)}>
+            <NavLink
+              to="/auth"
+              onClick={() => setMobileMenuOpen(false)}
+              className={`flex gap-2 items-center`}
+            >
+              <IoMdLogIn />
               Login
             </NavLink>
           )}

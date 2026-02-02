@@ -10,8 +10,15 @@ const Auth = () => {
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
   const navigate = useNavigate();
-  const { login, loading, register, token, isLoggedIn, setIsLoggedIn } =
-    useAppContext();
+  const {
+    login,
+    loading,
+    register,
+    token,
+    isLoggedIn,
+    setIsLoggedIn,
+    forgetPasswordHandler,
+  } = useAppContext();
 
   const location = useLocation();
 
@@ -137,16 +144,25 @@ const Auth = () => {
               </span>
             </p>
           ) : (
-            <p>
-              Create an new account?{" "}
-              <span
-                className=" underline cursor-pointer"
-                onClick={() => setState("signup")}
+            <>
+              {" "}
+              <p>
+                Create an new account?{" "}
+                <span
+                  className=" underline cursor-pointer"
+                  onClick={() => setState("signup")}
+                >
+                  {" "}
+                  Click here
+                </span>
+              </p>
+              <p
+                className="underline cursor-pointer"
+                onClick={forgetPasswordHandler}
               >
-                {" "}
-                Click here
-              </span>
-            </p>
+                Forgot your password?{" "}
+              </p>
+            </>
           )}
         </div>
       </form>
