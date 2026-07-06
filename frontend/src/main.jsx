@@ -6,8 +6,11 @@ import App from "@/app/App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import { AppProvider } from "@/context/AppContext.jsx";
 import { AppProvider2 } from "@/context/RegisterComplaintContext.jsx";
+import { AdminProvider } from "@/context/AdminContext.jsx";
+import { OfficerProvider } from "@/context/OfficerContext";
 
-// 🔹 STEP 3: Leaflet marker fix
+//  STEP 3: Leaflet marker fix --->
+
 import L from "leaflet";
 import markerIcon from "leaflet/dist/images/marker-icon.png";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
@@ -22,11 +25,15 @@ L.Icon.Default.mergeOptions({
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      <AppProvider2>
-        <AppProvider>
-          <App />
-        </AppProvider>
-      </AppProvider2>
+      <AdminProvider>
+        <OfficerProvider>
+          <AppProvider2>
+            <AppProvider>
+              <App />
+            </AppProvider>
+          </AppProvider2>
+        </OfficerProvider>
+      </AdminProvider>
     </BrowserRouter>
   </StrictMode>,
 );

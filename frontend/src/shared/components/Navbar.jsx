@@ -15,6 +15,7 @@ import { CgProfile } from "react-icons/cg";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { useAppContext } from "@/context/AppContext.jsx";
 import { toast } from "react-toastify";
+import { GrUserAdmin } from "react-icons/gr";
 
 const Navbar = () => {
   const [openProfile, setOpenProfile] = useState(false);
@@ -129,13 +130,23 @@ const Navbar = () => {
                 )}
               </>
             ) : (
-              <NavLink
-                to="/auth"
-                className="bg-white text-[#007EC5] px-4 py-2 rounded-full font-semibold flex gap-2 items-center shadow-sm hover:bg-blue-50 transition"
-              >
-                <IoMdLogIn />
-                Login
-              </NavLink>
+              <>
+                <NavLink
+                  to="/auth"
+                  className="bg-white text-[#007EC5] px-4 py-2 rounded-full font-semibold flex gap-2 items-center shadow-sm hover:bg-blue-50 transition"
+                >
+                  <IoMdLogIn />
+                  Citizen Login
+                </NavLink>
+
+                <NavLink
+                  to="/auth-officer"
+                  className="bg-white text-[#007EC5] px-4 py-2 rounded-full font-semibold flex gap-2 items-center shadow-sm hover:bg-blue-50 transition"
+                >
+                  <GrUserAdmin />
+                  Officer Login
+                </NavLink>
+              </>
             )}
           </div>
 
@@ -250,14 +261,24 @@ const Navbar = () => {
               </button>
             </>
           ) : (
-            <NavLink
-              to="/auth"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`flex gap-2 items-center`}
-            >
-              <IoMdLogIn />
-              Login
-            </NavLink>
+            <>
+              <NavLink
+                to="/auth"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex gap-2 items-center`}
+              >
+                <IoMdLogIn />
+                Citizen Login
+              </NavLink>
+              <NavLink
+                to="/auth"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex gap-2 items-center`}
+              >
+                <IoMdLogIn />
+                Officer Login
+              </NavLink>
+            </>
           )}
         </ul>
       </div>
