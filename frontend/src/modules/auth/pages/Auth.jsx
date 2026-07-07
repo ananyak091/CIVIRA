@@ -20,8 +20,16 @@ const Auth = () => {
   const [showConfirmPass, setShowConfirmPass] = useState(false);
 
   const navigate = useNavigate();
-  const { login, loading, register, token, isLoggedIn, setIsLoggedIn } =
-    useAppContext();
+  const {
+    login,
+    loading,
+    register,
+    token,
+    isLoggedIn,
+    setIsLoggedIn,
+    setUser,
+    setToken,
+  } = useAppContext();
 
   const { isLoading, setIsLoading } = useRegisterComplaintContext();
   const location = useLocation();
@@ -95,13 +103,18 @@ const Auth = () => {
       callback: async (response) => {
         try {
           console.log("Google response:", response);
-          const { data } = await axios.post(backendurl + "api/auth/google", {
+          console.log("backendurl:", backendurl);
+          console.log("Final URL:", backendurl + "/api/auth/google");
+          const { data } = await axios.post(backendurl + "/api/auth/google", {
             idToken: response.credential,
           });
           console.log("data in google sign-in:", data);
           if (data?.token) {
+            setToken(data.token);
+            setUser(data.user);
             localStorage.setItem("CIVIRA_token", data.token);
-            setIsLoggedIn(true);
+            // await loadUser(); // fetch /api/user/profile
+            // setIsLoggedIn(true);
             toast.success("Google sign-in successful");
             navigate("/");
           } else {

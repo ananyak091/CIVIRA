@@ -32,7 +32,7 @@ const Navbar = () => {
   return (
     <>
       {/* Navbar */}
-      <nav className="bg-gradient-to-r from-[#0069a8] via-[#007EC5] to-[#0a88d6] px-4 md:px-6 py-4 shadow-md sticky top-0 z-50 border-b border-white/10">
+      <nav className="bg-gradient-to-r from-primary-dark via-primary to-secondary px-4 md:px-6 py-4 shadow-md sticky top-0 z-50 border-b border-white/10">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           {/* Logo */}
           <NavLink to="/" className="flex items-center gap-3">

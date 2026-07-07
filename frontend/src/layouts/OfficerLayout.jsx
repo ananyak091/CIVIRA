@@ -45,10 +45,10 @@ const OfficerLayout = () => {
   return (
     <div className="flex min-h-screen bg-slate-100">
       {/* ================= Sidebar ================= */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-xl">
+      <aside className="fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white flex flex-col shadow-xl z-50">
         {/* Logo */}
         <div className="h-20 flex items-center px-6 border-b border-slate-800">
-          <div className="w-12 h-12 rounded-xl bg-green-600 flex items-center justify-center shadow-lg">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-primary-dark to-primary flex items-center justify-center shadow-lg">
             <FaShieldAlt className="text-xl" />
           </div>
 
@@ -68,15 +68,15 @@ const OfficerLayout = () => {
               className={({ isActive }) =>
                 `relative flex items-center gap-4 px-4 py-3 rounded-xl transition-all duration-200 ${
                   isActive
-                    ? "bg-green-600 text-white shadow-lg"
-                    : "text-slate-300 hover:bg-slate-800 hover:translate-x-1"
+                    ? "bg-gradient-to-r from-primary-dark to-primary text-white shadow-lg"
+                    : "text-slate-300 hover:bg-primary/10 hover:text-primary hover:translate-x-1"
                 }`
               }
             >
               {({ isActive }) => (
                 <>
                   {isActive && (
-                    <span className="absolute left-0 h-8 w-1 rounded-r bg-white"></span>
+                    <span className="absolute left-0 h-8 w-1 rounded-r bg-secondary"></span>
                   )}
 
                   <span className="text-lg">{item.icon}</span>
@@ -101,7 +101,7 @@ const OfficerLayout = () => {
       </aside>
 
       {/* ================= Main ================= */}
-      <div className="flex-1 flex flex-col">
+      <div className="ml-64 flex-1 flex flex-col min-h-screen">
         {/* Top Navbar */}
         <header className="sticky top-0 z-20 h-20 bg-white/90 backdrop-blur-md border-b border-slate-200 flex justify-between items-center px-8">
           {/* Left */}
@@ -116,8 +116,11 @@ const OfficerLayout = () => {
           {/* Right */}
           <div className="flex items-center gap-6">
             {/* Notification */}
-            <button className="relative p-3 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
-              <FaBell className="text-slate-700 text-lg" />
+            <button
+              className="relative p-3 rounded-xl bg-primary/10
+hover:bg-primary/20 transition"
+            >
+              <FaBell className="text-primary text-lg" />
 
               <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500"></span>
             </button>
@@ -134,7 +137,10 @@ const OfficerLayout = () => {
                 </p>
               </div>
 
-              <div className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-green-700 flex items-center justify-center text-white font-bold shadow-lg">
+              <div
+                className="w-12 h-12 rounded-full bg-gradient-to-r
+from-primary to-primary-dark flex items-center justify-center text-white font-bold shadow-lg"
+              >
                 {officer?.wardNo}
               </div>
             </div>
@@ -142,7 +148,7 @@ const OfficerLayout = () => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 overflow-y-auto bg-slate-100 p-6">
+        <main className="flex-1 overflow-y-auto bg-background p-6">
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 min-h-[calc(100vh-130px)] p-8">
             <Outlet />
           </div>

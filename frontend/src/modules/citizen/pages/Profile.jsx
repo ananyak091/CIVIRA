@@ -57,7 +57,7 @@ const Myprofile = () => {
 
       console.log("formdata", formData);
       const { data } = await axios.post(
-        backendurl + "api/user/update-profile",
+        backendurl + "/api/user/update-profile",
         formData,
         {
           headers: { authorization: `Bearer ${token}` },

@@ -37,10 +37,10 @@ const AdminLayout = () => {
   return (
     <div className="flex min-h-screen bg-slate-100">
       {/* Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white flex flex-col shadow-xl">
+      <aside className="fixed left-0 top-0 h-screen w-64 bg-slate-900 text-white flex flex-col shadow-xl z-50">
         {/* Logo */}
         <div className="h-20 flex items-center px-6 border-b border-slate-800">
-          <div className="w-12 h-12 rounded-xl bg-green-600 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-primary-dark to-primary flex items-center justify-center">
             <FaShieldAlt className="text-xl" />
           </div>
 
@@ -59,7 +59,7 @@ const AdminLayout = () => {
               className={({ isActive }) =>
                 `flex items-center gap-4 px-4 py-3 rounded-xl transition-all ${
                   isActive
-                    ? "bg-green-600 text-white shadow"
+                    ? "bg-gradient-to-r from-primary-dark to-primary text-white shadow-lg"
                     : "text-slate-300 hover:bg-slate-800 hover:text-white"
                 }`
               }
@@ -83,9 +83,10 @@ const AdminLayout = () => {
       </aside>
 
       {/* Right Section */}
-      <div className="flex-1 flex flex-col">
+      <div className="ml-64 flex-1 flex flex-col min-h-screen">
         {/* Top Navbar */}
-        <header className="h-20 bg-white border-b shadow-sm flex items-center justify-between px-8">
+        <header className="sticky top-0 z-40 h-20 bg-white border-b shadow-sm flex items-center justify-between px-8">
+          {" "}
           <div>
             <h1 className="text-2xl font-bold text-slate-800">
               Admin Dashboard
@@ -94,14 +95,13 @@ const AdminLayout = () => {
               Manage officers and monitor the system.
             </p>
           </div>
-
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="font-semibold text-slate-700">Administrator</p>
               <p className="text-sm text-gray-500">System Admin</p>
             </div>
 
-            <div className="w-12 h-12 rounded-full bg-green-600 flex items-center justify-center text-white font-bold text-lg">
+            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-white font-bold text-lg">
               A
             </div>
           </div>

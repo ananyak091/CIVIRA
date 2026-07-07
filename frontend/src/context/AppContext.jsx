@@ -16,6 +16,7 @@ export const AppProvider = ({ children }) => {
   );
 
   const [userData, setUserData] = useState(false);
+
   const [complaintsData, setComplaintsData] = useState([]);
   const [stats, setStats] = useState({
     registered: 1,
@@ -95,7 +96,7 @@ export const AppProvider = ({ children }) => {
   // GET PROFILE
   const getProfile = async () => {
     try {
-      const user = await axios.get(API_BASE_URL + "api/user/get-profile", {
+      const user = await axios.get(API_BASE_URL + "/api/user/get-profile", {
         headers: { authorization: `Bearer ${token}` },
       });
       console.log("Get profile user data", user);
@@ -115,7 +116,7 @@ export const AppProvider = ({ children }) => {
   const getMyComplaints = async () => {
     try {
       const complaints = await axios.get(
-        API_BASE_URL + "api/user/my-complaints",
+        API_BASE_URL + "/api/user/my-complaints",
         {
           headers: { authorization: `Bearer ${token}` },
         },
@@ -139,7 +140,7 @@ export const AppProvider = ({ children }) => {
 
       console.log("After Navigate in complaint details");
       const complaintDetails = await axios.get(
-        `${API_BASE_URL}api/user/my-complaints/${id}`,
+        `${API_BASE_URL}/api/user/my-complaints/${id}`,
         {
           headers: {
             authorization: `Bearer ${token}`,
@@ -242,6 +243,9 @@ export const AppProvider = ({ children }) => {
         stats,
         recentComplaints,
         forgetPasswordHandler,
+        setToken,
+        setUser,
+        getMyComplaints,
       }}
     >
       {children}

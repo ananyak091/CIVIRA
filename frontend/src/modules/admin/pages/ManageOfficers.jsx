@@ -93,7 +93,7 @@ const ManageOfficers = () => {
       {/* Table */}
       <div className="bg-white rounded-xl shadow overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-green-600 text-white">
+          <thead className="bg-primary text-white">
             <tr>
               <th className="px-6 py-4 text-left">Officer ID</th>
               <th className="px-6 py-4 text-left">Initial Password</th>

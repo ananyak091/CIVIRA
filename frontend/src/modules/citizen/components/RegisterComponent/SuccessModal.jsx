@@ -2,16 +2,19 @@ import React from "react";
 import { Check } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useRegisterComplaintContext } from "@/context/RegisterComplaintContext";
+import { useAppContext } from "@/context/AppContext";
 
 const SuccessModal = ({ onClose }) => {
   const navigate = useNavigate();
+  const { getMyComplaints } = useAppContext();
 
   const handleSubmitAnother = () => {
     onClose();
     navigate("/register-complaints");
   };
-  const handleMyComplaints = () => {
+  const handleMyComplaints = async () => {
     onClose();
+    await getMyComplaints();
     navigate("/my-complaints");
   };
   return (

@@ -145,7 +145,7 @@ Password   : ${res.data.password}
     <div className="min-h-screen bg-gray-100 flex justify-center p-8">
       <div className="bg-white shadow-lg rounded-xl p-8 w-full max-w-xl">
         <div className="flex items-center gap-3 mb-8">
-          <FaUserPlus className="text-green-600 text-3xl" />
+          <FaUserPlus className="text-primary text-3xl" />
           <h1 className="text-3xl font-bold">Create Officer</h1>
         </div>
 
@@ -225,7 +225,7 @@ Password   : ${res.data.password}
             disabled={!wardAvailable}
             className={`w-full py-3 rounded-lg text-white font-semibold ${
               wardAvailable
-                ? "bg-green-600 hover:bg-green-700"
+                ? "bg-primary hover:bg-primary-dark transition"
                 : "bg-gray-400 cursor-not-allowed"
             }`}
           >

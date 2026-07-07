@@ -95,12 +95,12 @@ const Complaint = () => {
         <div className="flex gap-3">
           {/* Search */}
           <div className="relative">
-            <FaSearch className="absolute left-4 top-4 text-gray-400" />
+            <FaSearch className="absolute left-4 top-4 text-primary" />
 
             <input
               type="text"
               placeholder="Search..."
-              className="pl-11 pr-4 py-3 rounded-xl border bg-white w-72 focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="pl-11 pr-4 py-3 rounded-xl border bg-white w-72 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -108,7 +108,7 @@ const Complaint = () => {
 
           {/* Filter */}
           <select
-            className="rounded-xl border px-4 bg-white"
+            className="rounded-xl border border-slate-300 bg-white px-4 focus:outline-none focus:ring-2 focus:ring-primary"
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -121,9 +121,9 @@ const Complaint = () => {
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-2xl bg-white shadow border">
+      <div className="overflow-hidden rounded-2xl bg-white border border-slate-200 shadow-md">
         <table className="w-full">
-          <thead className="bg-slate-900 text-white">
+          <thead bg-gradient-to-r from-primary-dark to-primary text-white>
             <tr>
               <th className="px-6 py-4 text-left">Complaint ID</th>
               <th className="px-6 py-4 text-left">Title</th>
@@ -138,7 +138,10 @@ const Complaint = () => {
           <tbody>
             {filteredComplaints.length ? (
               filteredComplaints.map((complaint) => (
-                <tr key={complaint._id} className="border-b hover:bg-gray-50">
+                <tr
+                  key={complaint._id}
+                  className="border-b hover:bg-primary/5 transition"
+                >
                   <td className="px-6 py-4 font-medium">{complaint._id}</td>
 
                   <td className="px-6 py-4">{complaint.title}</td>
@@ -154,7 +157,7 @@ const Complaint = () => {
                   <td className="px-6 py-4 text-center">{complaint.date}</td>
 
                   <td className="px-6 py-4 text-center">
-                    <button className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 transition">
+                    <button className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-primary-dark to-primary px-4 py-2 text-white shadow hover:shadow-lg hover:scale-105 transition-all duration-300">
                       <FaEye />
                       View
                     </button>

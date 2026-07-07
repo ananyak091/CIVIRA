@@ -131,10 +131,8 @@ const App = () => {
         </Route>
 
         {/* Admin Login */}
-        <Route element={<AdminLayout />}>
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route path="/admin/verify-otp" element={<VerifyOTP />} />
-        </Route>
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route path="/admin/verify-otp" element={<VerifyOTP />} />
 
         {/* Admin Panel */}
         <Route
