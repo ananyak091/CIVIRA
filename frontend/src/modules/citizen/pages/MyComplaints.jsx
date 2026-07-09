@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   FileText,
@@ -23,6 +23,7 @@ const MyComplaints = () => {
     handleComplaintDetails,
     stats,
     recentComplaints,
+    getMyComplaints,
   } = useAppContext();
 
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const MyComplaints = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
   const [status, setStatus] = useState("All");
+  const [time, setTime] = useState("All");
 
   // My Complaint API
 
@@ -46,20 +48,6 @@ const MyComplaints = () => {
       icon: <Trash2 size={18} />,
     },
   ];
-
-  // --- Filtering Logic ---
-  const filteredComplaints = useMemo(() => {
-    const s = searchTerm.toLowerCase();
-    return complaintsData;
-    //.filter(
-    //   (c) =>
-    //     (c.title.toLowerCase().includes(s) ||
-    //       c.id.includes(s) ||
-    //       c.location.toLowerCase().includes(s)) &&
-    //     (category === "All" || c.category === category) &&
-    //     (status === "All" || c.status === status),
-    // );
-  }, [category, status]);
 
   // --- Status Styles ---
   const statusStyles = {
@@ -96,6 +84,15 @@ const MyComplaints = () => {
     },
   ];
 
+  useEffect(() => {
+    getMyComplaints({
+      category,
+      status,
+      time,
+      search: searchTerm,
+    });
+  }, [category, status, time, searchTerm]);
+
   return (
     <div className="min-h-screen p-6 bg-slate-50 text-slate-900">
       <main className="max-w-6xl py-10 mx-auto">
@@ -103,7 +100,7 @@ const MyComplaints = () => {
         <header className="mb-10 text-center">
           <h1 className="text-4xl font-bold md:text-5xl text-slate-800">
             My Complaints
-            {console.log("My Filtered Complaints data", filteredComplaints)}
+            {console.log("My Filtered Complaints data", complaintsData)}
           </h1>
           <p className="mt-2 text-slate-500">
             View and track the status of your reported issues
@@ -139,17 +136,30 @@ const MyComplaints = () => {
             label="Category"
             value={category}
             onChange={setCategory}
-            options={["All", "Garbage", "Pothole", "Streetlight", "Drainage"]}
+            options={["All", "Garbage", "Potholes", "Streetlight", "Drainage"]}
           />
           <FilterSelect
             label="Status"
             value={status}
             onChange={setStatus}
-            options={["All", "In Progress", "Pending", "Resolved", "Success"]}
+            options={[
+              "All",
+              "Registered",
+              "Pending",
+              "Resolved",
+              "Rejected",
+              "Success",
+            ]}
           />
           <FilterSelect
             label="Time"
-            options={["Last 30 Days", "Last 3 Months"]}
+            value={time}
+            onChange={setTime}
+            options={[
+              { label: "All", value: "All" },
+              { label: "Last 30 Days", value: "30" },
+              { label: "Last 3 Months", value: "90" },
+            ]}
           />
 
           <div className="space-y-1.5">
@@ -239,16 +249,22 @@ const FilterSelect = ({ label, value, onChange, options }) => (
     <label className="text-[10px] uppercase font-bold text-slate-600 ml-1">
       {label}
     </label>
+
     <select
       value={value}
-      onChange={(e) => onChange?.(e.target.value)}
+      onChange={(e) => onChange(e.target.value)}
       className="w-full bg-white border border-slate-300 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500/30"
     >
-      {options.map((opt) => (
-        <option key={opt} value={opt}>
-          {opt}
-        </option>
-      ))}
+      {options.map((opt) => {
+        const optionValue = typeof opt === "string" ? opt : opt.value;
+        const optionLabel = typeof opt === "string" ? opt : opt.label;
+
+        return (
+          <option key={optionValue} value={optionValue}>
+            {optionLabel}
+          </option>
+        );
+      })}
     </select>
   </div>
 );

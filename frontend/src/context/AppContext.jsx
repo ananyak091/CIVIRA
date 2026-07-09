@@ -113,24 +113,33 @@ export const AppProvider = ({ children }) => {
   };
 
   // GET MY COMPLAINTS
-  const getMyComplaints = async () => {
+  const getMyComplaints = async ({
+    category = "All",
+    status = "All",
+    time = "All",
+    search = "",
+  } = {}) => {
     try {
-      const complaints = await axios.get(
-        API_BASE_URL + "/api/user/my-complaints",
+      const response = await axios.get(
+        `${API_BASE_URL}/api/user/my-complaints`,
         {
-          headers: { authorization: `Bearer ${token}` },
+          headers: {
+            authorization: `Bearer ${token}`,
+          },
+          params: {
+            category,
+            status,
+            time,
+            search,
+          },
         },
       );
-      console.log("Get my complaints data", complaints);
 
-      if (complaints) {
-        setComplaintsData(complaints.data.complaints);
-      } else {
-        toast.error(data.message);
+      if (response.data.success) {
+        setComplaintsData(response.data.complaints);
       }
     } catch (error) {
-      console.log("Get Complaints error", error);
-      toast.error(error.message);
+      console.log(error);
     }
   };
 
@@ -165,6 +174,9 @@ export const AppProvider = ({ children }) => {
 
   // const calCulateComplaintsData = () => {};
   useEffect(() => {
+    console.log("complaintsData =", complaintsData);
+    console.log("Is array?", Array.isArray(complaintsData));
+
     console.log("Calculating complaints data");
     let registered = 0;
     let resolved = 0;
