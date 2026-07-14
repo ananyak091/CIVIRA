@@ -71,10 +71,10 @@ export const AppProvider2 = ({ children }) => {
       );
 
       console.log("All images valid:", response.data);
-      setValidImages(response.data.allValid);
+      setValidImages(response.data.isValid);
       setIsLoading(false);
 
-      if (response.data.allValid) {
+      if (response.data.isValid) {
         toast.success("Images validated successfully.");
       } else {
         toast.error("Some images are invalid. Please retake the photos.");
