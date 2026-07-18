@@ -36,7 +36,7 @@ import ManageOfficers from "@/modules/admin/pages/ManageOfficers";
 
 // Shared
 import NotFound from "@/shared/NotFound";
-import VerifyOTP from "@/modules/admin/pages/VerifyOtp";
+import VerifyOTP from "@/modules/admin/pages/VerifyOTP";
 import Complaint from "@/modules/officer/pages/Complaint";
 import OfficerProfile from "@/modules/officer/pages/OfficerProfile";
 import ComplaintDetailsOfficer from "@/modules/officer/pages/ComplaintDetailsOfficer";
