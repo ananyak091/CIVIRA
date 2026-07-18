@@ -10,7 +10,7 @@ const AuthLayout = () => {
       <main className="min-h-screen bg-primaryColor flex items-center justify-center">
         <Outlet />
       </main>
-
+      {/* hiiiiiiiiii */}
       <Footer />
     </>
   );
