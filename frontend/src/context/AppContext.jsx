@@ -29,6 +29,33 @@ export const AppProvider = ({ children }) => {
   const [complaintDetails, setComplaintDetails] = useState([]);
   const [evidence, setEvidence] = useState([]);
 
+  // For Dashboard
+  const [summary, setSummary] = useState({
+    totalComplaints: 0,
+    pending: 0,
+    resolved: 0,
+    inProgress: 0,
+    resolutionRate: 0,
+  });
+
+  const [filters, setFilters] = useState({
+    state: "All",
+    city: "All",
+    ward: "All",
+    time: "All",
+  });
+
+  const [dashboardFilters, setDashboardFilters] = useState({
+    states: [],
+    cities: [],
+    wards: [],
+  });
+  const [categoryData, setCategoryData] = useState([]);
+  const [urgencyData, setUrgencyData] = useState([]);
+  const [monthlyData, setMonthlyData] = useState([]);
+  const [resolutionTrend, setResolutionTrend] = useState([]);
+  const [topWards, setTopWards] = useState([]);
+
   const navigate = useNavigate();
 
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -254,6 +281,137 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // ------ ------  Dashboard ------- ------- //
+  const fetchDashboard = async () => {
+    try {
+      const response = await api.get("/api/dashboard/stats", {
+        params: filters,
+      });
+
+      if (response.data.success) {
+        setSummary(response.data.summary);
+      }
+      console.log(response.data);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, [filters]);
+
+  const fetchDashboardFilters = async () => {
+    try {
+      const response = await api.get("/api/dashboard/filters", {
+        params: {
+          state: filters.state,
+          city: filters.city,
+        },
+      });
+
+      if (response.data.success) {
+        setDashboardFilters(response.data.filters);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  useEffect(() => {
+    fetchDashboardFilters();
+  }, [filters.state, filters.city]);
+
+  const fetchCategoryBreakdown = async () => {
+    try {
+      const response = await api.get("/api/dashboard/category-breakdown", {
+        params: filters,
+      });
+
+      if (response.data.success) {
+        setCategoryData(response.data.categoryData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    fetchCategoryBreakdown();
+  }, [filters]);
+
+  const fetchUrgencyDistribution = async () => {
+    try {
+      const response = await api.get("/api/dashboard/urgency-distribution", {
+        params: filters,
+      });
+
+      if (response.data.success) {
+        setUrgencyData(response.data.urgencyData);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUrgencyDistribution();
+  }, [filters]);
+
+  const fetchMonthlyComplaints = async () => {
+    try {
+      const response = await api.get("/api/dashboard/monthly", {
+        params: filters,
+      });
+
+      if (response.data.success) {
+        setMonthlyData(response.data.monthlyData);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchMonthlyComplaints();
+  }, [filters]);
+
+  const fetchResolutionTrend = async () => {
+    try {
+      const response = await api.get("/api/dashboard/resolution-trend", {
+        params: filters,
+      });
+
+      if (response.data.success) {
+        setResolutionTrend(response.data.result);
+      }
+
+      console.log(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchTopWards = async () => {
+    try {
+      const response = await api.get("/api/dashboard/top-wards", {
+        params: filters,
+      });
+
+      console.log(response.data);
+
+      if (response.data.success) {
+        setTopWards(response.data.topWards || []);
+      } else {
+        setTopWards([]);
+      }
+    } catch (err) {
+      console.error(err);
+      setTopWards([]);
+    }
+  };
+  useEffect(() => {
+    fetchTopWards();
+  }, [filters]);
+
   return (
     <AppContext.Provider
       value={{
@@ -284,6 +442,29 @@ export const AppProvider = ({ children }) => {
         unreadCount,
         setUnreadCount,
         fetchUnreadCount,
+        summary,
+        setSummary,
+        filters,
+        setFilters,
+        fetchDashboard,
+        dashboardFilters,
+        setDashboardFilters,
+        fetchDashboardFilters,
+        categoryData,
+        setCategoryData,
+        fetchCategoryBreakdown,
+        urgencyData,
+        setUrgencyData,
+        fetchUrgencyDistribution,
+        monthlyData,
+        setMonthlyData,
+        fetchMonthlyComplaints,
+        resolutionTrend,
+        setResolutionTrend,
+        fetchResolutionTrend,
+        topWards,
+        setTopWards,
+        fetchTopWards,
       }}
     >
       {children}

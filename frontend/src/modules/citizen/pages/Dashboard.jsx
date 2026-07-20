@@ -1,12 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+
 import {
   FileText,
   CheckCircle2,
   Clock,
   AlertCircle,
-  MapPin,
-  Calendar,
   ChevronDown,
   BarChart3,
   PieChart as PieIcon,
@@ -14,6 +13,32 @@ import {
   Layers,
   Award,
 } from "lucide-react";
+
+import { Pie, Doughnut, Bar, Line } from "react-chartjs-2";
+
+import {
+  Chart as ChartJS,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+ChartJS.register(
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  PointElement,
+  LineElement,
+  Tooltip,
+  Legend,
+);
+import { useAppContext } from "../../../context/AppContext";
 
 // Mock Data for the filters and rankings
 const initialWards = [
@@ -57,44 +82,178 @@ const initialWards = [
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [selectedState, setSelectedState] = useState("All States");
-  const [selectedCity, setSelectedCity] = useState("All Cities");
-  const [selectedWard, setSelectedWard] = useState("All Wards");
-  const [selectedDate, setSelectedDate] = useState("Last 30 Days");
+
+  const {
+    summary,
+    filters,
+    setFilters,
+    fetchDashboard,
+    dashboardFilters,
+    setDashboardFilters,
+    fetchDashboardFilters,
+    categoryData,
+    setCategoryData,
+    fetchCategoryBreakdown,
+    urgencyData,
+    setUrgencyData,
+    fetchUrgencyDistribution,
+    monthlyData,
+    setMonthlyData,
+    fetchMonthlyComplaints,
+    resolutionTrend,
+    setResolutionTrend,
+    fetchResolutionTrend,
+    topWards,
+    setTopWards,
+    fetchTopWards,
+  } = useAppContext();
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardFilters();
+  }, []);
+
+  useEffect(() => {
+    fetchCategoryBreakdown();
+  }, []);
+  useEffect(() => {
+    fetchResolutionTrend();
+  }, []);
+  useEffect(() => {
+    fetchTopWards();
+  }, []);
 
   // Main KPI Statistics
   const statistics = [
     {
       label: "Total Complaints",
-      value: 1245,
+      value: summary.totalComplaints,
       icon: <FileText size={20} />,
       color: "bg-blue-600 ring-blue-100",
-      textColor: "text-blue-600",
     },
     {
       label: "Resolved",
-      value: 930,
+      value: summary.resolved,
       icon: <CheckCircle2 size={20} />,
       color: "bg-emerald-600 ring-emerald-100",
-      textColor: "text-emerald-600",
     },
     {
       label: "In Progress",
-      value: 105,
+      value: summary.inProgress,
       icon: <Clock size={20} />,
       color: "bg-amber-600 ring-amber-100",
-      textColor: "text-amber-600",
     },
     {
       label: "Pending",
-      value: 210,
+      value: summary.pending,
       icon: <AlertCircle size={20} />,
       color: "bg-rose-600 ring-rose-100",
-      textColor: "text-rose-600",
     },
   ];
 
-  const resolutionRate = 74;
+  const pieData = {
+    labels: categoryData.map((item) => item._id),
+
+    datasets: [
+      {
+        data: categoryData.map((item) => item.count),
+
+        backgroundColor: [
+          "#2563eb",
+          "#10b981",
+          "#f59e0b",
+          "#ef4444",
+          "#8b5cf6",
+          "#06b6d4",
+          "#ec4899",
+          "#14b8a6",
+        ],
+
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const pieOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+    },
+  };
+
+  const doughnutData = {
+    labels: urgencyData.map((item) => item._id),
+
+    datasets: [
+      {
+        data: urgencyData.map((item) => item.count),
+
+        backgroundColor: ["#ef4444", "#f59e0b", "#22c55e"],
+
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const doughnutOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+    },
+  };
+
+  const barData = {
+    labels: monthlyData.map((item) => item.month),
+
+    datasets: [
+      {
+        label: "Complaints",
+        data: monthlyData.map((item) => item.complaints),
+        backgroundColor: "#2563eb",
+      },
+    ],
+  };
+
+  const lineData = {
+    labels: resolutionTrend.map((item) => item.month),
+
+    datasets: [
+      {
+        label: "Resolved Complaints",
+        data: resolutionTrend.map((item) => item.resolved),
+
+        borderColor: "#10b981",
+
+        backgroundColor: "#10b981",
+
+        tension: 0.4,
+
+        fill: false,
+      },
+    ],
+  };
+  const lineOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+    },
+  };
+
+  const resolutionRate = summary.resolutionRate;
 
   return (
     <div className="min-h-screen p-4 bg-slate-50 md:p-8">
@@ -126,13 +285,20 @@ export default function Dashboard() {
             <div className="relative">
               <select
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-700"
-                value={selectedState}
-                onChange={(e) => setSelectedState(e.target.value)}
+                value={filters.state}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    state: e.target.value,
+                  })
+                }
               >
-                <option>All States</option>
-                <option>Maharashtra</option>
-                <option>Karnataka</option>
-                <option>Delhi</option>
+                <option value="All">All States</option>
+                {dashboardFilters.states.map((state) => (
+                  <option key={state} value={state}>
+                    {state}
+                  </option>
+                ))}
               </select>
               <ChevronDown
                 size={14}
@@ -148,13 +314,20 @@ export default function Dashboard() {
             <div className="relative">
               <select
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-700"
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
+                value={filters.city}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    city: e.target.value,
+                  })
+                }
               >
-                <option>All Cities</option>
-                <option>Mumbai</option>
-                <option>Bengaluru</option>
-                <option>New Delhi</option>
+                <option value="All">All Cities</option>
+                {dashboardFilters.cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
               </select>
               <ChevronDown
                 size={14}
@@ -170,13 +343,20 @@ export default function Dashboard() {
             <div className="relative">
               <select
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-700"
-                value={selectedWard}
-                onChange={(e) => setSelectedWard(e.target.value)}
+                value={filters.ward}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    ward: e.target.value,
+                  })
+                }
               >
-                <option>All Wards</option>
-                <option>Ward A</option>
-                <option>Ward 4</option>
-                <option>Zone 2</option>
+                <option value="All">All Wards</option>
+                {dashboardFilters.wards.map((ward) => (
+                  <option key={ward} value={ward}>
+                    {ward}
+                  </option>
+                ))}
               </select>
               <ChevronDown
                 size={14}
@@ -192,13 +372,18 @@ export default function Dashboard() {
             <div className="relative">
               <select
                 className="w-full pl-3 pr-8 py-2 text-sm font-semibold bg-slate-50 border border-slate-200 rounded-lg appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500/20 text-slate-700"
-                value={selectedDate}
-                onChange={(e) => setSelectedDate(e.target.value)}
+                value={filters.time}
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    time: e.target.value,
+                  })
+                }
               >
-                <option>Today</option>
-                <option>Last 7 Days</option>
-                <option>Last 30 Days</option>
-                <option>Custom Range</option>
+                <option value="All">All Time</option>
+                <option value="7">Last 7 Days</option>
+                <option value="30">Last 30 Days</option>
+                <option value="90">Last 90 Days</option>
               </select>
               <ChevronDown
                 size={14}
@@ -258,11 +443,14 @@ export default function Dashboard() {
               <PieIcon size={18} className="text-slate-500" />
               <h3 className="font-bold text-slate-700">Category breakdown</h3>
             </div>
-            <div className="flex flex-col items-center justify-center flex-1 py-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 my-3">
-              <div className="w-20 h-20 rounded-full border-8 border-blue-500 border-t-emerald-500 border-r-amber-500 animate-spin-slow mb-2 opacity-60" />
-              <p className="text-xs font-semibold text-slate-400">
-                Pie Chart View Ready
-              </p>
+            <div className="flex justify-center items-center flex-1 p-4">
+              {categoryData.length > 0 ? (
+                <div className="w-60 h-60">
+                  <Pie data={pieData} options={pieOptions} />
+                </div>
+              ) : (
+                <p>No Data Available</p>
+              )}
             </div>
           </div>
 
@@ -272,57 +460,60 @@ export default function Dashboard() {
               <Layers size={18} className="text-slate-500" />
               <h3 className="font-bold text-slate-700">Urgency Distribution</h3>
             </div>
-            <div className="flex flex-col items-center justify-center flex-1 py-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 my-3">
-              <div className="w-20 h-20 rounded-full border-[14px] border-slate-200 border-t-rose-500 mb-2 opacity-70" />
-              <p className="text-xs font-semibold text-slate-400">
-                Doughnut Chart View Ready
-              </p>
+            <div className="flex justify-center items-center flex-1 p-4">
+              {urgencyData.length > 0 ? (
+                <div className="w-60 h-60">
+                  <Doughnut data={doughnutData} options={doughnutOptions} />
+                </div>
+              ) : (
+                <p className="text-gray-500">No Data Available</p>
+              )}
             </div>
           </div>
 
           {/* Bar Chart Panel */}
-          <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <BarChart3 size={18} className="text-slate-500" />
               <h3 className="font-bold text-slate-700">
                 Monthly Complaint Volume
               </h3>
             </div>
-            <div className="flex items-end justify-center gap-2 flex-1 py-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 my-3 h-24">
-              <div className="w-4 bg-blue-400 h-12 rounded-t" />
-              <div className="w-4 bg-blue-500 h-16 rounded-t" />
-              <div className="w-4 bg-blue-600 h-24 rounded-t" />
-              <div className="w-4 bg-slate-300 h-8 rounded-t" />
+
+            <div className="h-72 p-4">
+              {monthlyData.length > 0 ? (
+                <Bar
+                  data={barData}
+                  options={{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                  }}
+                />
+              ) : (
+                <p className="text-center mt-20 text-gray-500">
+                  No Data Available
+                </p>
+              )}
             </div>
-            <p className="text-center text-xs font-semibold text-slate-400">
-              Bar Chart View Ready
-            </p>
           </div>
 
           {/* Line Chart Panel */}
-          <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+          <div className="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <LineIcon size={18} className="text-slate-500" />
               <h3 className="font-bold text-slate-700">
                 Resolution Speed Velocity
               </h3>
             </div>
-            <div className="flex flex-col items-center justify-center flex-1 py-4 border-2 border-dashed border-slate-100 rounded-xl bg-slate-50/50 my-3">
-              <svg
-                className="w-28 h-12 text-emerald-500 opacity-60"
-                viewBox="0 0 100 30"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-              >
-                <path
-                  d="M0,25 Q15,5 30,15 T60,5 T90,20"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <p className="text-xs font-semibold text-slate-400 mt-2">
-                Line Chart View Ready
-              </p>
+
+            <div className="h-72 p-4">
+              {resolutionTrend.length > 0 ? (
+                <Line data={lineData} options={lineOptions} />
+              ) : (
+                <p className="text-center mt-20 text-gray-500">
+                  No Data Available
+                </p>
+              )}
             </div>
           </div>
         </section>
@@ -350,7 +541,7 @@ export default function Dashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-sm font-medium text-slate-700">
-                {initialWards.map((item) => (
+                {(topWards || []).map((item) => (
                   <tr
                     key={item.rank}
                     className="transition hover:bg-slate-50/80"
@@ -381,7 +572,7 @@ export default function Dashboard() {
                     <td className="px-6 py-3.5 text-right font-black text-slate-800 pr-8">
                       <div className="inline-flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                        {item.rate}
+                        {item.rate}%
                       </div>
                     </td>
                   </tr>
